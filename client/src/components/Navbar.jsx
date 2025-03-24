@@ -105,7 +105,7 @@ export default function Navbar() {
             </NavLink>
             
             <NavLink 
-              to="#" 
+              to="contact" 
               icon={<Mail size={18} />} 
               isScrolled={isScrolled}
               colors={colors}
