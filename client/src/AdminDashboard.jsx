@@ -22,7 +22,6 @@ export default function AdminDashboard() {
           
           <Route path="/students" element={<Students />} />
           <Route path="/teachers" element={<Teachers />} />
-          <Route path="/parents" element={<Parents />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/news" element={<News />} />
           <Route path="/messages" element={<Messages />} />

@@ -11,7 +11,7 @@ const Footer = () => {
           
           {/* Column 1: Site Information */}
           <div className="text-right">
-            <h4 className="text-2xl font-bold mb-6 text-[#D8D2C2] border-r-4 border-[#B17457] pr-4">دروب النجاح</h4>
+            <h4 className="text-2xl font-bold mb-6 text-[#D8D2C2] border-r-4 border-[#B17457] pr-4"> الحصاد التربوي  </h4>
             <div className="space-y-4">
               <div className="flex items-center space-x-3 space-x-reverse">
                 <FaPhone className="text-[#B17457]" />
@@ -29,22 +29,22 @@ const Footer = () => {
             <h4 className="text-xl font-bold mb-6 text-[#D8D2C2] border-r-4 border-[#B17457] pr-4">روابط سريعة</h4>
             <ul className="space-y-3">
               <li>
-                <Link to="#" className="text-[#FAF7F0] hover:text-[#B17457] transition-colors duration-300 flex items-center">
+                <Link to="studentForm" className="text-[#FAF7F0] hover:text-[#B17457] transition-colors duration-300 flex items-center">
                   <span className="hover:pr-2 transition-all duration-300">التسجيل كطالب</span>
                 </Link>
               </li>
               <li>
-                <Link to="#" className="text-[#FAF7F0] hover:text-[#B17457] transition-colors duration-300 flex items-center">
+                <Link to="teacherForm" className="text-[#FAF7F0] hover:text-[#B17457] transition-colors duration-300 flex items-center">
                   <span className="hover:pr-2 transition-all duration-300">التسجيل كمعلم</span>
                 </Link>
               </li>
               <li>
-                <Link to="#" className="text-[#FAF7F0] hover:text-[#B17457] transition-colors duration-300 flex items-center">
+                <Link to="contact" className="text-[#FAF7F0] hover:text-[#B17457] transition-colors duration-300 flex items-center">
                   <span className="hover:pr-2 transition-all duration-300">تواصل معنا</span>
                 </Link>
               </li>
               <li>
-                <Link to="#" className="text-[#FAF7F0] hover:text-[#B17457] transition-colors duration-300 flex items-center">
+                <Link to="about" className="text-[#FAF7F0] hover:text-[#B17457] transition-colors duration-300 flex items-center">
                   <span className="hover:pr-2 transition-all duration-300">حول</span>
                 </Link>
               </li>
@@ -77,7 +77,7 @@ const Footer = () => {
 
         {/* Bottom Section: Copyright */}
         <div className="text-center text-sm">
-          <p>&copy; {new Date().getFullYear()} دروب النجاح. جميع الحقوق محفوظة.</p>
+          <p>&copy; {new Date().getFullYear()}  الحصاد التربوي . جميع الحقوق محفوظة.</p>
         </div>
       </div>
     </footer>

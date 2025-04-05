@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const contactRoutes = require('./route/contactRoute'); // Correct path to routes
 const app = express();
 const connectDB = require("./DBConfig/Mongo");
+const studentRoutes = require('./route/studentRoute'); // Import student routes
 
 dotenv.config();
 
@@ -17,8 +18,11 @@ app.use(
 );
 app.use(express.json());
 
+
 // API routes for the contact form
 app.use('/api', contactRoutes);
+app.use('/api', studentRoutes);
+
 
 // Call the function to connect to MongoDB
 connectDB();

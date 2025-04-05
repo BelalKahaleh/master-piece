@@ -1,186 +1,265 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import Swal from 'sweetalert2';
+import React, { useState, useEffect } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Send, User, Mail, MessageSquare, Check, X } from 'lucide-react';
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: '',
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [focused, setFocused] = useState(null);
+  const [formErrors, setFormErrors] = useState({});
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  // Colors from your design
+  const primaryColor = '#B17457';
+  const textColor = '#4A4947';
+  const hoverColor = '#D8D2C2';
+  const lightColor = '#F8F6F2';
+
+  // Validate email format
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
   };
+
+  // Validate form fields
+  const validateForm = () => {
+    const errors = {};
+    if (!name.trim()) errors.name = 'الاسم مطلوب';
+    if (!email.trim()) errors.email = 'البريد الإلكتروني مطلوب';
+    else if (!validateEmail(email)) errors.email = 'البريد الإلكتروني غير صالح';
+    if (!message.trim()) errors.message = 'الرسالة مطلوبة';
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Toastify configuration
+  const notifySuccess = () => toast.success('تم إرسال الرسالة بنجاح!', {
+    position: "top-center",
+    icon: <Check size={18} color="white" />,
+    style: { background: primaryColor, color: 'white' }
+  });
+  
+  const notifyError = (error) => toast.error(error, {
+    position: "top-center",
+    icon: <X size={18} color="white" />,
+    style: { background: '#e74c3c', color: 'white' }
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    
+    // Validate form
+    const isValid = validateForm();
+    if (!isValid) {
+      notifyError('يرجى تصحيح الأخطاء في النموذج');
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/contact', formData, {
+      const response = await fetch('http://localhost:5000/api/contact', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ name, email, message }),
       });
 
-      if (response.status === 200) {
-        Swal.fire({
-          title: 'Success!',
-          text: 'Your message has been sent successfully.',
-          icon: 'success',
-          confirmButtonText: 'OK',
-          background: '#FAF7F0',
-          color: '#4A4947',
-          confirmButtonColor: '#B17457',
-        });
-
-        // Clear the form fields after successful submission
-        setFormData({ name: '', email: '', message: '' });
+      if (response.ok) {
+        setShowSuccessMessage(true);
+        notifySuccess();
+        setName('');
+        setEmail('');
+        setMessage('');
+        
+        // Hide success message after 5 seconds
+        setTimeout(() => {
+          setShowSuccessMessage(false);
+        }, 5000);
+      } else {
+        const data = await response.json();
+        notifyError(data.message || 'فشل إرسال الرسالة');
       }
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to send message. Please try again later.');
-      Swal.fire({
-        title: 'Error!',
-        text: 'There was a problem sending your message.',
-        icon: 'error',
-        confirmButtonText: 'OK',
-        background: '#FAF7F0',
-        color: '#4A4947',
-        confirmButtonColor: '#B17457',
-      });
+    } catch (error) {
+      notifyError('خطأ في الخادم الداخلي');
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
-  return (
-    <div className="w-full bg-[#FAF7F0] min-h-screen py-16 px-4">
-      <div className="max-w-3xl mx-auto">
-        {/* Heading section with decorative elements */}
-        <div className="text-center mb-12 relative">
-          <h1 className="text-4xl font-bold text-[#4A4947] mb-2">Get in Touch</h1>
-          <p className="text-[#4A4947]/80 max-w-lg mx-auto">
-            We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+  // Animated input field component
+  const AnimatedInput = ({ type, id, label, value, onChange, placeholder, error, icon }) => {
+    const isFocused = focused === id;
+    
+    return (
+      <div className="mb-6 relative">
+        <label 
+          htmlFor={id} 
+          className={`block text-sm font-medium transition-all duration-300 ${
+            isFocused ? `text-${primaryColor}` : 'text-gray-600'
+          }`}
+        >
+          {label}
+        </label>
+        
+        <div className={`mt-1 relative rounded-lg overflow-hidden transition-all duration-300 ${
+          error ? 'ring-2 ring-red-500' : isFocused ? 'ring-2 ring-opacity-50 ring-[#B17457]' : ''
+        }`}>
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+            {icon}
+          </div>
+          
+          {type === 'textarea' ? (
+            <textarea
+              id={id}
+              rows="4"
+              className="w-full border border-gray-300 rounded-lg pr-10 pl-4 py-3 text-[#4A4947] focus:outline-none transition-all duration-300"
+              value={value}  // Ensure the value is tied to the state variable
+              onChange={(e) => onChange(e.target.value)}  // Correctly update state value
+              placeholder={placeholder}
+              onFocus={() => setFocused(id)}
+              onBlur={() => setFocused(null)}
+              dir="rtl"
+            />
+          ) : (
+            <input
+              type={type}
+              id={id}
+              className="w-full border border-gray-300 rounded-lg pr-10 pl-4 py-3 text-[#4A4947] focus:outline-none transition-all duration-300"
+              value={value}  // Ensure the value is tied to the state variable
+              onChange={(e) => onChange(e.target.value)}  // Correctly update state value
+              placeholder={placeholder}
+              onFocus={() => setFocused(id)}
+              onBlur={() => setFocused(null)}
+              dir="rtl"
+            />
+          )}
+        </div>
+        
+        {error && (
+          <p className="mt-1 text-sm text-red-500 flex items-center justify-end">
+            <X size={14} className="mr-1" /> {error}
           </p>
-          <div className="absolute left-1/2 -translate-x-1/2 w-24 h-1 bg-[#B17457] mt-4"></div>
-        </div>
-
-        {/* Contact form card */}
-        <div className="bg-white rounded-lg shadow-xl overflow-hidden">
-          {/* Top decorative bar */}
-          <div className="h-2 bg-[#B17457]"></div>
-          
-          <div className="p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-[#4A4947]">Your Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full p-3 bg-[#FAF7F0] border border-[#D8D2C2] rounded-md focus:ring-2 focus:ring-[#B17457]/50 focus:border-[#B17457] transition-all duration-200"
-                    placeholder="John Doe"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-[#4A4947]">Your Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full p-3 bg-[#FAF7F0] border border-[#D8D2C2] rounded-md focus:ring-2 focus:ring-[#B17457]/50 focus:border-[#B17457] transition-all duration-200"
-                    placeholder="john@example.com"
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-[#4A4947]">Your Message</label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  className="w-full p-3 bg-[#FAF7F0] border border-[#D8D2C2] rounded-md focus:ring-2 focus:ring-[#B17457]/50 focus:border-[#B17457] transition-all duration-200 min-h-[150px] resize-y"
-                  placeholder="How can we help you today?"
-                  required
-                ></textarea>
-              </div>
-              
-              <div className="pt-4">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={`w-full py-3.5 px-6 bg-[#B17457] hover:bg-[#B17457]/90 text-white font-medium rounded-md shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center ${loading ? 'opacity-75 cursor-not-allowed' : ''}`}
-                >
-                  {loading ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Sending Message...
-                    </>
-                  ) : (
-                    'Send Message'
-                  )}
-                </button>
-              </div>
-            </form>
-
-            {error && (
-              <div className="mt-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded">
-                <p className="font-medium">Error</p>
-                <p className="text-sm">{error}</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Contact information below form */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-          <div className="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-[#D8D2C2] rounded-full mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#4A4947]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-[#4A4947]">Email Us</h3>
-            <p className="text-[#4A4947]/80 mt-2">contact@example.com</p>
-          </div>
-          
-          <div className="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-[#D8D2C2] rounded-full mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#4A4947]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-[#4A4947]">Call Us</h3>
-            <p className="text-[#4A4947]/80 mt-2">(123) 456-7890</p>
-          </div>
-          
-          <div className="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-[#D8D2C2] rounded-full mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#4A4947]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-[#4A4947]">Visit Us</h3>
-            <p className="text-[#4A4947]/80 mt-2">123 Business Ave, Suite 100</p>
-          </div>
-        </div>
+        )}
       </div>
+    );
+  };
+
+  // Success message component with animation
+  const SuccessMessage = () => (
+    <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-95 rounded-lg z-10 animate-fadeIn">
+      <div className="text-center p-6">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+          <Check size={32} className="text-green-600" />
+        </div>
+        <h3 className="text-xl font-bold text-[#4A4947] mb-2">شكراً لك!</h3>
+        <p className="text-gray-600 mb-4">تم استلام رسالتك وسنتواصل معك قريباً</p>
+        <button 
+          onClick={() => setShowSuccessMessage(false)}
+          className="px-4 py-2 bg-[#B17457] text-white rounded-md hover:bg-[#D8D2C2] transition-colors duration-300 flex items-center mx-auto"
+        >
+          حسناً <Check size={16} className="mr-2" />
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="w-full max-w-lg mx-auto relative" dir="rtl">
+      <div className={`bg-white p-8 rounded-lg shadow-lg mt-16 transition-all duration-300 relative overflow-hidden ${
+        isSubmitting ? 'opacity-70' : ''
+      }`}>
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#B17457] to-[#D8D2C2]"></div>
+        <div className="absolute top-0 right-0 w-20 h-20 bg-[#F8F6F2] rounded-bl-full opacity-70"></div>
+        
+        {/* Contact form header */}
+        <div className="flex items-center justify-center mb-8">
+          <div className="w-12 h-12 rounded-full bg-[#F8F6F2] flex items-center justify-center mr-4">
+            <MessageSquare size={24} className="text-[#B17457]" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-[#4A4947]">اتصل بنا</h2>
+            <p className="text-gray-500 text-sm">نحن هنا للمساعدة والإجابة على أسئلتك</p>
+          </div>
+        </div>
+        
+        {/* Contact form */}
+        <form onSubmit={handleSubmit}>
+          <AnimatedInput 
+            type="text"
+            id="name"
+            label="الاسم"
+            value={name}
+            onChange={(e) => setName(e)}
+            placeholder="اسمك"
+            error={formErrors.name}
+            icon={<User size={18} className="text-[#B17457]" />}
+          />
+          
+          <AnimatedInput 
+            type="email"
+            id="email"
+            label="البريد الإلكتروني"
+            value={email}
+            onChange={(e) => setEmail(e)}
+            placeholder="بريدك الإلكتروني"
+            error={formErrors.email}
+            icon={<Mail size={18} className="text-[#B17457]" />}
+          />
+          
+          <AnimatedInput 
+            type="textarea"
+            id="message"
+            label="الرسالة"
+            value={message}
+            onChange={(e) => setMessage(e)}
+            placeholder="رسالتك"
+            error={formErrors.message}
+            icon={<MessageSquare size={18} className="text-[#B17457]" />}
+          />
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`w-full bg-[#B17457] text-white font-semibold py-3 px-4 rounded-lg hover:bg-[#D8D2C2] focus:outline-none focus:ring-2 focus:ring-[#B17457] focus:ring-opacity-50 transition-all duration-300 flex items-center justify-center ${
+              isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
+          >
+            {isSubmitting ? (
+              <span className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                جاري الإرسال...
+              </span>
+            ) : (
+              <span className="flex items-center">
+                إرسال الرسالة <Send size={16} className="mr-2" />
+              </span>
+            )}
+          </button>
+        </form>
+        
+        {/* Success message overlay */}
+        {showSuccessMessage && <SuccessMessage />}
+      </div>
+      
+      {/* Toast container */}
+      <ToastContainer 
+        position="top-center" 
+        autoClose={5000} 
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
     </div>
   );
 };

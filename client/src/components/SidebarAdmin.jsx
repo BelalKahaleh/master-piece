@@ -52,26 +52,7 @@ const SidebarAdmin = () => {
           </Link>
         </li>
         <li>
-          <Link 
-            to="/admin/parents" 
-            className="block py-3 px-4 flex items-center transition-colors duration-200 border-r-4 border-transparent" 
-            style={{ 
-              backgroundColor: "#4A4947", 
-              color: "#FAF7F0",
-              borderRightColor: "transparent"
-            }}
-            onMouseOver={e => {
-              e.currentTarget.style.backgroundColor = "#B17457";
-              e.currentTarget.style.borderRightColor = "#FAF7F0";
-            }}
-            onMouseOut={e => {
-              e.currentTarget.style.backgroundColor = "#4A4947";
-              e.currentTarget.style.borderRightColor = "transparent";
-            }}
-          >
-            <span className="ml-2">👨‍👩‍👧‍👦</span>
-            <span>أولياء الأمور</span>
-          </Link>
+         
         </li>
         <li>
           <Link 
@@ -103,9 +84,9 @@ const SidebarAdmin = () => {
               backgroundColor: "#4A4947", 
               color: "#FAF7F0",
               borderRightColor: "transparent"
-            }}
+            }} 
             onMouseOver={e => {
-              e.currentTarget.style.backgroundColor = "#B17457";
+              e.currentTarget.style.backgroundColor = "#B17457";  
               e.currentTarget.style.borderRightColor = "#FAF7F0";
             }}
             onMouseOut={e => {

@@ -9,7 +9,8 @@ import {
   LogIn,
   User,
   BookOpen,
-  Users
+  Users,
+  Newspaper 
 } from "lucide-react";
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 
@@ -61,7 +62,7 @@ export default function Navbar() {
               className="text-2xl font-bold tracking-tight relative group"
               style={{ color: isScrolled ? colors.lightCream : colors.darkGray }}
             >
-              <span className="inline-block transition-transform duration-300 group-hover:scale-105"> درُوب النَّجَاح</span>
+              <span className="inline-block transition-transform duration-300 group-hover:scale-105"> الحصاد التربوي </span>
               <span 
                 className="absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full" 
                 style={{ backgroundColor: colors.terracotta }}
@@ -87,23 +88,30 @@ export default function Navbar() {
             dir="rtl"
           >
             <NavLink 
-              to="#" 
+              to="/" 
               icon={<Home size={18} />} 
               isScrolled={isScrolled}
               colors={colors}
             >
               الرئيسية
             </NavLink>
-            
             <NavLink 
-              to="#" 
+              to="news" 
+              icon={<Newspaper size={18} />} 
+              isScrolled={isScrolled}
+              colors={colors}
+            >
+              الأخبار
+            </NavLink>
+            <NavLink 
+              to="AboutUs" 
               icon={<Info size={18} />} 
               isScrolled={isScrolled}
               colors={colors}
             >
               حول
             </NavLink>
-            
+           
             <NavLink 
               to="contact" 
               icon={<Mail size={18} />} 
@@ -141,14 +149,14 @@ export default function Navbar() {
                     borderColor: colors.terracotta 
                   }}
                 >
-                  <DropdownItem to="#" icon={<User size={16} />} colors={colors}>
+                  <DropdownItem to="studentLogin" icon={<User size={16} />} colors={colors}>
                     بوابة الطالب
                   </DropdownItem>
-                  <DropdownItem to="#" icon={<BookOpen size={16} />} colors={colors}>
+                  <DropdownItem to="teacherLogin" icon={<BookOpen size={16} />} colors={colors}>
                     بوابة المعلم
                   </DropdownItem>
-                  <DropdownItem to="#" icon={<Users size={16} />} colors={colors}>
-                    بوابة الاباء
+                  <DropdownItem to="adminLogin" icon={<Users size={16} />} colors={colors}>
+                    بوابة المدير
                   </DropdownItem>
                 </div>
               )}
@@ -162,16 +170,16 @@ export default function Navbar() {
           style={{ backgroundColor: colors.darkGray }}
         >
           <div className="flex flex-col py-2 px-4 space-y-1 rtl" dir="rtl">
-            <MobileNavLink to="#" icon={<Home size={18} />} colors={colors}>
+            <MobileNavLink to="/" icon={<Home size={18} />} colors={colors}>
               الرئيسية
             </MobileNavLink>
             
-            <MobileNavLink to="#" icon={<Info size={18} />} colors={colors}>
+            <MobileNavLink to="about" icon={<Info size={18} />} colors={colors}>
               حول
             </MobileNavLink>
             
             <MobileNavLink 
-              to="#" 
+              to="contact" 
               icon={<Mail size={18} />} 
               colors={colors}
               isHighlighted={true}
@@ -199,14 +207,14 @@ export default function Navbar() {
                 className={`overflow-hidden transition-all duration-200 rounded-md mt-1 ${dropdownOpen ? "max-h-48 opacity-100" : "max-h-0 opacity-0"}`}
                 style={{ backgroundColor: colors.beige }}
               >
-                <MobileDropdownItem to="#" icon={<User size={16} />} colors={colors}>
+                <MobileDropdownItem to="studentLogin" icon={<User size={16} />} colors={colors}>
                   بوابة الطالب
                 </MobileDropdownItem>
-                <MobileDropdownItem to="#" icon={<BookOpen size={16} />} colors={colors}>
+                <MobileDropdownItem to="teacherLogin" icon={<BookOpen size={16} />} colors={colors}>
                   بوابة المعلم
                 </MobileDropdownItem>
-                <MobileDropdownItem to="#" icon={<Users size={16} />} colors={colors}>
-                  بوابة الاباء
+                <MobileDropdownItem to="adminLogin" icon={<Users size={16} />} colors={colors}>
+                  بوابة المدير
                 </MobileDropdownItem>
               </div>
             </div>
