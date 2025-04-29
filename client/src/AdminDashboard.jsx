@@ -4,10 +4,11 @@ import { Route, Routes, Navigate } from "react-router-dom";
 import SidebarAdmin from "./components/SidebarAdmin";
 import Students from "./pages/Students";
 import Teachers from "./pages/Teachers";
-import Parents from "./pages/Parents";
 import Courses from "./pages/Courses";
 import Messages from "./pages/Messages";
 import News from "./pages/News";
+import Admins from "./pages/Admins" 
+import Section from "./pages/Section";
 
 export default function AdminDashboard() {
   return (
@@ -22,9 +23,12 @@ export default function AdminDashboard() {
           
           <Route path="/students" element={<Students />} />
           <Route path="/teachers" element={<Teachers />} />
-          <Route path="/courses" element={<Courses />} />
+          <Route path="/classes" element={<Courses />} />
+          <Route path="/section" element={<Section />} />
           <Route path="/news" element={<News />} />
           <Route path="/messages" element={<Messages />} />
+          <Route path="/allAdmins" element={<Admins />} />
+
           
           {/* Catch-all route to redirect if an invalid route is accessed */}
           <Route path="*" element={<Navigate to="/admin/students" />} />

@@ -1,21 +1,23 @@
-// backend/models/studentModel.js
+// server/models/studentModel.js
+const mongoose = require("mongoose");
+const bcrypt   = require("bcryptjs");
 
-const mongoose = require('mongoose');
-
-// Define the schema for the Student model
 const studentSchema = new mongoose.Schema({
-  studentName: { type: String, required: true },
-  email: { type: String, required: true },
-  gender: { type: String, required: true },
-  educationLevel: { type: String, required: true },
-  marks: { type: Number, required: true },
-  birthCertificate: { type: String, required: true },
-  studentPicture: { type: String, required: true },
-  marksCertificate: { type: String, required: true },
-  orderStatus: { type: String, default: 'pending' }, // Default status is "pending"
-}, { timestamps: true }); // Automatically add createdAt and updatedAt fields
+  fullName:         { type: String, required: true },
+  email:            { type: String, required: true, unique: true },
+  password:         { type: String, required: true },           // new
+  gender:           { type: String, enum: ["ذكر", "أنثى"], required: true },
+  stage:            { type: String, required: true },
+  transcriptPath:   String,
+  birthCertPath:    String,
+  studentPhotoPath: String,
+}, { timestamps: true });
 
-// Create the Student model
-const Student = mongoose.model('student', studentSchema);
+// Hash password before saving
+studentSchema.pre("save", async function(next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
 
-module.exports = Student;
+module.exports = mongoose.model("Student", studentSchema);

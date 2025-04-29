@@ -1,29 +1,95 @@
-// backend/controllers/contact.controller.js
+// File: backend/controllers/contactController.js
+require('dotenv').config()
+const Contact = require('../model/contactModel')
+const nodemailer = require('nodemailer')
 
-const Contact = require('../model/contactModel'); // Import the Contact model
-
-// Controller to create a new contact message
-const createContactMessage = async (req, res) => {
+// create new message
+exports.createContactMessage = async (req, res) => {
   try {
-    const { name, email, message } = req.body;
-
-    // Ensure that all fields are provided
+    const { name, email, message } = req.body
     if (!name || !email || !message) {
-      return res.status(400).json({ message: 'All fields are required!' });
+      return res.status(400).json({ message: 'All fields are required' })
     }
-
-    // Create a new contact message entry in the database
-    const newContactMessage = new Contact({ name, email, message });
-
-    // Save the message in the database
-    await newContactMessage.save();
-
-    // Send success response
-    res.status(201).json({ message: 'Message sent successfully!' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    const msg = new Contact({ name, email, message })
+    await msg.save()
+    res.status(201).json({ message: 'Message sent successfully' })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Internal server error' })
   }
-};
+}
 
-module.exports = { createContactMessage };
+// list all messages
+exports.getAllMessages = async (req, res) => {
+  try {
+    const list = await Contact.find().sort({ createdAt: -1 })
+    res.json(list)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Server error' })
+  }
+}
+
+// get one message
+exports.getMessageById = async (req, res) => {
+  try {
+    const msg = await Contact.findById(req.params.id)
+    if (!msg) return res.status(404).json({ message: 'Not found' })
+    res.json(msg)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Server error' })
+  }
+}
+
+// mark read/unread
+exports.toggleRead = async (req, res) => {
+  try {
+    const msg = await Contact.findByIdAndUpdate(
+      req.params.id,
+      { read: req.body.read },
+      { new: true }
+    )
+    if (!msg) return res.status(404).json({ message: 'Not found' })
+    res.json(msg)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Server error' })
+  }
+}
+
+// send reply email
+exports.sendReply = async (req, res) => {
+  try {
+    const { reply } = req.body
+    const msg = await Contact.findById(req.params.id)
+    if (!msg) return res.status(404).json({ message: 'Not found' })
+
+    // configure transporter using EMAIL_* env vars
+    const transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: Number(process.env.EMAIL_PORT),
+      secure: false, // use STARTTLS on port 587
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    })
+
+    // verify SMTP connection
+    await transporter.verify()
+
+    // send the email
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to: msg.email,
+      subject: `رد على رسالتك من ${msg.name}`,
+      text: reply
+    })
+
+    res.json({ message: 'Reply sent' })
+  } catch (err) {
+    console.error('sendReply error:', err)
+    res.status(500).json({ message: err.message || 'Internal server error' })
+  }
+}

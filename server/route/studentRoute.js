@@ -1,8 +1,18 @@
-const express = require('express');
-const { registerStudent } = require('../controller/studentController');  // Correct import
-const router = express.Router();
+// server/routes/studentRoute.js
+const router = require("express").Router();
+const upload = require("../middleware/uploadMiddleware");
+const { createStudent, getStudents } = require("../controller/studentController");
 
-// POST route to register a new student
-router.post('/register-student', registerStudent);  // Using the imported registerStudent function
+router.post(
+  "/",
+  upload.fields([
+    { name: "transcript", maxCount: 1 },
+    { name: "birthCert",  maxCount: 1 },
+    { name: "photo",      maxCount: 1 },
+  ]),
+  createStudent
+);
+
+router.get("/", getStudents);
 
 module.exports = router;

@@ -6,9 +6,9 @@ import Home from "./pages/home";
 import AdminDashboard from "./AdminDashboard";
 import Contact from "./pages/Contact";
 import AboutUs from "./pages/AboutUs";
-import StudentForm from "./pages/studentForm";
-import studentDashboard from "./studentDashboard";
-import teacherDashboard from "./teacherDashboard";
+import StudentDashboard from "./studentDashboard";
+import TeacherDashboard from "./teacherDashboard";
+import AdminLogin from "./pages/AdminLogin";
 
 function App() {
   return (
@@ -32,16 +32,14 @@ function App() {
         <AboutUs />
         <Footer />
         </>} />
-        <Route path="/studentForm" element={<>
-        <Navbar />
-        <StudentForm />
-        <Footer />
+        
+        <Route path="/adminLogin" element={<>
+        <AdminLogin />
         </>} />
-
         {/* Admin routes will not show Navbar or Footer */}
         <Route path="/admin/*" element={<AdminDashboard />} />
-        <Route path="/student/*" element={<studentDashboard />} />
-        <Route path="/teacher/*" element={<teacherDashboard />} />
+        <Route path="/student/*" element={<StudentDashboard />} />
+        <Route path="/teacher/*" element={<TeacherDashboard />} />
       </Routes>
       
   );
