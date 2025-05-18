@@ -3,6 +3,7 @@ import React from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
 import News from "./pages/News";
 import StudentNavbar from "./components/StudentNavbar";
+import StudentProfile from "./pages/student/studentProfile";
 
 export default function studentDashboard() {
   return (
@@ -12,12 +13,11 @@ export default function studentDashboard() {
       <div className="flex-1 bg-gray-100 p-4">
         {/* Define admin routes */}
         <Routes>
-          {/* Default route for admin dashboard */}
-          {/* <Route path="/" element={<StudentProfile />} />
-          <Route path="/studentcourses" element={<CoursesStudent />} />
-          <Route path="/exam" element={<StudentExam />} />
-          <Route path="/marks" element={<StudentMark />} />
-          <Route path="/studentGuide" element={<StudentGuide />} /> */}
+          <Route path="/studentProfile" element={<StudentProfile />} />
+           {/* <Route path="/studentcourses" element={<CoursesStudent />} />
+           <Route path="/exam" element={<StudentExam />} />
+           <Route path="/marks" element={<StudentMark />} />
+           <Route path="/studentGuide" element={<StudentGuide />} />  */}
           
           {/* Catch-all route to redirect if an invalid route is accessed */}
       

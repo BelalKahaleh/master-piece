@@ -1,17 +1,19 @@
-const express = require('express')
+// routes/contactRoute.js
+const express = require("express");
 const {
   createContactMessage,
   getAllMessages,
   getMessageById,
   toggleRead,
-  sendReply
-} = require('../controller/contactController')
-const router = express.Router()
+  sendReply,
+} = require("../controller/contactController");
+const router = express.Router();
 
-router.post('/contact', createContactMessage)
-router.get('/contact', getAllMessages)
-router.get('/contact/:id', getMessageById)
-router.patch('/contact/:id/read', toggleRead)
-router.post('/contact/:id/reply', sendReply)
+// now all paths are relative, e.g. POST /api/contact/
+router.post("/", createContactMessage);
+router.get("/", getAllMessages);
+router.get("/:id", getMessageById);
+router.patch("/:id/read", toggleRead);
+router.post("/:id/reply", sendReply);
 
-module.exports = router
+module.exports = router;

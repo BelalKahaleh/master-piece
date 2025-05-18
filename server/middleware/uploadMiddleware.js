@@ -1,9 +1,15 @@
 // server/middlewares/uploadMiddleware.js
 const multer = require("multer");
 const path   = require("path");
+const fs = require("fs");
 
-// تأكد من أن هذا المسار صحيح وينتهي بوجود مجلّد uploads
-const UPLOAD_DIR = path.join(__dirname, "../uploads");
+// تأكد من أن هذا المسار صحيح وينتهي بوجود مجلّد uploads/news
+const UPLOAD_DIR = path.join(__dirname, "../uploads/news");
+
+// Create the directory if it doesn't exist
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
 
 // إعداد التخزين
 const storage = multer.diskStorage({

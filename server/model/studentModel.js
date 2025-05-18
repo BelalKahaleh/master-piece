@@ -11,6 +11,7 @@ const studentSchema = new mongoose.Schema({
   transcriptPath:   String,
   birthCertPath:    String,
   studentPhotoPath: String,
+  class:            { type: mongoose.Schema.Types.ObjectId, ref: 'Class' } // Reference to the class
 }, { timestamps: true });
 
 // Hash password before saving

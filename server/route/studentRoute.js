@@ -1,7 +1,7 @@
 // server/routes/studentRoute.js
 const router = require("express").Router();
 const upload = require("../middleware/uploadMiddleware");
-const { createStudent, getStudents } = require("../controller/studentController");
+const { createStudent, getStudents  , getStudent, getUnassignedStudents } = require("../controller/studentController");
 
 router.post(
   "/",
@@ -15,4 +15,8 @@ router.post(
 
 router.get("/", getStudents);
 
+// Add the route for fetching unassigned students by level
+router.get("/unassigned/:level", getUnassignedStudents);
+
+router.get("/:id", getStudent);
 module.exports = router;

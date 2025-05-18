@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import StudentProfile from "../pages/student/studentProfile";
 
 const StudentNavbar = () => {
   const [activeItem, setActiveItem] = useState(null);

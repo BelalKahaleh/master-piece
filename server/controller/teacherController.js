@@ -1,26 +1,15 @@
 const Teacher = require('../model/teacherModel')
 
-// GET /api/teachers?search=&specialization=
+// GET /api/teachers
 exports.getTeachers = async (req, res) => {
   try {
-    const { search = '', specialization = '' } = req.query
-    const filter = {}
-    if (specialization) filter.specialization = specialization
-    if (search.trim()) {
-      const q = search.trim()
-      filter.$or = [
-        { fullName: new RegExp(q, 'i') },
-        { email:    new RegExp(q, 'i') }
-      ]
-    }
-    const list = await Teacher
-      .find(filter)
-      .select('-password')
-      .sort({ createdAt: -1 })
-    res.json(list)
+    console.log('Fetching teachers from database...');
+    const teachers = await Teacher.find().select('-password').sort({ createdAt: -1 });
+    console.log(`Found ${teachers.length} teachers`);
+    res.json(teachers);
   } catch (err) {
-    console.error(err)
-    res.status(500).json({ message: 'Server error' })
+    console.error('Error fetching teachers:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 }
 
@@ -31,8 +20,8 @@ exports.createTeacher = async (req, res) => {
     if (!fullName || !email || !password || !specialization) {
       return res.status(400).json({ message: 'All fields are required' })
     }
-    const resumeFile = req.files.resume?.[0]?.filename
-    const photoFile  = req.files.photo?.[0]?.filename
+    const resumeFile = req.files?.resume?.[0]?.filename
+    const photoFile  = req.files?.photo?.[0]?.filename
 
     const teacher = new Teacher({
       fullName,
@@ -47,7 +36,7 @@ exports.createTeacher = async (req, res) => {
     delete out.password
     res.status(201).json(out)
   } catch (err) {
-    console.error(err)
+    console.error('Error creating teacher:', err)
     res.status(500).json({ message: 'Internal server error' })
   }
 }

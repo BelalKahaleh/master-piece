@@ -1,7 +1,7 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
-const SidebarAdmin = () => {
+const SidebarAdmin = ({ sidebarOpen, setSidebarOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeRoute, setActiveRoute] = useState("");
@@ -17,11 +17,9 @@ const SidebarAdmin = () => {
     { path: "/admin/students", icon: "👨‍🎓", label: "الطلاب" },
     { path: "/admin/teachers", icon: "👨‍🏫", label: "المعلمون" },
     { path: "/admin/classes", icon: "📚", label: "الصفوف" },
-    { path: "/admin/section", icon: "📚", label: "الشعب" },
     { path: "/admin/news", icon: "📰", label: "الأخبار" },
     { path: "/admin/messages", icon: "✉️", label: "الرسائل" },
     { path: "/admin/allAdmins", icon: "👨‍🎓", label: "المسؤولون" }
-
   ];
 
   // Handle smooth page transitions
@@ -31,6 +29,7 @@ const SidebarAdmin = () => {
       setTimeout(() => {
         navigate(path);
         setIsTransitioning(false);
+        if (setSidebarOpen) setSidebarOpen(false); // close sidebar on mobile after navigation
       }, 300);
     }
   };
@@ -38,9 +37,9 @@ const SidebarAdmin = () => {
   const handleLogout = () => {
     setIsTransitioning(true);
     setTimeout(() => {
-      // هنا يمكنك مسح بيانات الجلسة أو التوكن إذا لزم الأمر
       navigate("/adminLogin");
       setIsTransitioning(false);
+      if (setSidebarOpen) setSidebarOpen(false);
     }, 300);
   };
 
@@ -54,8 +53,29 @@ const SidebarAdmin = () => {
           visibility: isTransitioning ? "visible" : "hidden"
         }}
       />
-      
-      <div className="w-64 h-screen text-white fixed top-0 right-0 shadow-lg" style={{ backgroundColor: "#4A4947" }}>
+      {/* Responsive sidebar overlay for mobile */}
+      <div
+        className={`fixed inset-0 z-40 bg-black bg-opacity-40 transition-opacity lg:hidden ${sidebarOpen ? "block" : "hidden"}`}
+        onClick={() => setSidebarOpen && setSidebarOpen(false)}
+      />
+      <div
+        className={`
+          fixed top-0 right-0 z-50 h-screen w-64 text-white shadow-lg transition-transform duration-300
+          ${sidebarOpen ? "translate-x-0" : "translate-x-full"}
+          lg:translate-x-0 lg:static lg:block
+        `}
+        style={{ backgroundColor: "#4A4947" }}
+      >
+        {/* Close button for mobile */}
+        <button
+          className="lg:hidden absolute top-4 left-4 p-2 text-white"
+          onClick={() => setSidebarOpen && setSidebarOpen(false)}
+          aria-label="Close sidebar"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
         <div className="p-4 text-xl font-bold flex items-center justify-center" style={{ backgroundColor: "#B17457", color: "#FAF7F0" }}>
           <span className="transition-transform duration-300 transform hover:scale-105">لوحة تحكم المسؤول</span>
         </div>
@@ -94,7 +114,6 @@ const SidebarAdmin = () => {
                   transform: activeRoute === link.path ? "scale(1.2)" : "scale(1)"
                 }}>{link.icon}</span>
                 <span>{link.label}</span>
-                
                 {/* Active indicator line animation */}
                 <span 
                   className="absolute bottom-0 right-0 h-0.5 bg-white transition-all duration-500 ease-in-out"
