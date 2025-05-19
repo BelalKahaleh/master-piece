@@ -5,13 +5,7 @@ import SidebarAdmin from '../components/SidebarAdmin';
 import Swal from 'sweetalert2';
 import { toast } from 'react-hot-toast';
 import {
-  PlusIcon,
   TrashIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  AcademicCapIcon,
-  ClockIcon,
-  UserGroupIcon,
   PencilIcon,
   EyeIcon
 } from '@heroicons/react/24/outline';
@@ -34,6 +28,8 @@ const Students = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const studentsPerPage = 6;
 
   // New state for editing
   const [isEditing, setIsEditing] = useState(false);
@@ -66,6 +62,22 @@ const Students = () => {
     }
     setFiltered(result);
   }, [students, search, stageFilter]);
+
+  // Calculate pagination
+  const indexOfLastStudent = currentPage * studentsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
+  const currentStudents = filtered.slice(indexOfFirstStudent, indexOfLastStudent);
+  const totalPages = Math.ceil(filtered.length / studentsPerPage);
+
+  // Handle page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Reset to first page when filter or search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, stageFilter]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -230,7 +242,7 @@ const Students = () => {
           )}
 
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((s) => (
+            {currentStudents.map((s) => (
               <div key={s._id} className="bg-white rounded-lg shadow-sm overflow-hidden transition-all hover:shadow-md">
                 <div className="h-2" style={{ backgroundColor: COLORS.accent }}></div>
                 <div className="p-5">
@@ -277,6 +289,64 @@ const Students = () => {
               </div>
             )}
           </div>
+
+          {/* Pagination Controls */}
+          {filtered.length > 0 && (
+            <div className="mt-8 flex justify-center items-center space-x-2 space-x-reverse">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 rounded-lg border transition-colors ${
+                  currentPage === 1
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:bg-gray-50'
+                }`}
+                style={{ 
+                  borderColor: COLORS.border,
+                  color: COLORS.text,
+                  backgroundColor: COLORS.bg
+                }}
+              >
+                السابق
+              </button>
+              
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index + 1}
+                  onClick={() => handlePageChange(index + 1)}
+                  className={`px-4 py-2 rounded-lg border transition-colors ${
+                    currentPage === index + 1
+                      ? 'text-white'
+                      : 'hover:bg-gray-50'
+                  }`}
+                  style={{
+                    borderColor: COLORS.border,
+                    backgroundColor: currentPage === index + 1 ? COLORS.accent : COLORS.bg,
+                    color: currentPage === index + 1 ? 'white' : COLORS.text
+                  }}
+                >
+                  {index + 1}
+                </button>
+              ))}
+
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`px-4 py-2 rounded-lg border transition-colors ${
+                  currentPage === totalPages
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:bg-gray-50'
+                }`}
+                style={{ 
+                  borderColor: COLORS.border,
+                  color: COLORS.text,
+                  backgroundColor: COLORS.bg
+                }}
+              >
+                التالي
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Modals */}

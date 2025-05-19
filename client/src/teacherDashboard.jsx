@@ -3,8 +3,7 @@ import React from "react";
 import { Route, Routes, Navigate, Outlet } from "react-router-dom";
 import TeacherNavbar from "./components/TeacherNavbar";
 import TeacherProfile from "./pages/teacher/teacherProfile";
-// Import other teacher pages here as needed, e.g.,
-// import CoursesTeacher from "./pages/teacher/coursesTeacher";
+import CoursesTeacher from "./pages/teacher/CoursesTeacher";
 // import TeacherExam from "./pages/teacher/teacherExam";
 // import TeacherMark from "./pages/teacher/teacherMark";
 // import TeacherGuide from "./pages/teacher/teacherGuide";
@@ -25,7 +24,7 @@ export default function TeacherDashboard() {
           <Route path="teacherProfile" element={<TeacherProfile />} />
 
           {/* Add routes for other teacher pages, e.g., */}
-          {/* <Route path="coursesTeacher" element={<CoursesTeacher />} /> */}
+          <Route path="coursesTeacher" element={<CoursesTeacher />} />
           {/* <Route path="examTeacher" element={<TeacherExam />} /> */}
           {/* <Route path="marksTeacher" element={<TeacherMark />} /> */}
           {/* <Route path="teacherGuide" element={<TeacherGuide />} /> */}

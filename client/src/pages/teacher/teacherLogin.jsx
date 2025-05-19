@@ -35,7 +35,7 @@ export default function TeacherLogin() {
     e.preventDefault();
     setError('');
     try {
-      const res = await axios.post('http://localhost:5000/api/teachers/login', formData);
+      const res = await axios.post('http://localhost:5000/api/teachers/login', formData, { withCredentials: true });
       console.log('Login successful:', res.data);
       
       // Store token in a cookie

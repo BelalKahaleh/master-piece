@@ -27,6 +27,8 @@ const Teachers = () => {
   const [showModal, setShow] = useState(false);
   const [showDetailsModal, setShowDetails] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const teachersPerPage = 6;
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -133,6 +135,17 @@ const Teachers = () => {
     setShow(true);
   };
 
+  // Calculate pagination
+  const indexOfLastTeacher = currentPage * teachersPerPage;
+  const indexOfFirstTeacher = indexOfLastTeacher - teachersPerPage;
+  const currentTeachers = list.slice(indexOfFirstTeacher, indexOfLastTeacher);
+  const totalPages = Math.ceil(list.length / teachersPerPage);
+
+  // Handle page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <div className="flex min-h-screen bg-[#FAF7F0]" dir="rtl">
       {/* Hamburger button for mobile */}
@@ -193,7 +206,7 @@ const Teachers = () => {
 
           {/* Teacher List */}
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {list.map(t => (
+            {currentTeachers.map(t => (
               <div
                 key={t._id}
                 className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-all"
@@ -256,6 +269,64 @@ const Teachers = () => {
               </div>
             )}
           </div>
+
+          {/* Pagination Controls */}
+          {list.length > 0 && (
+            <div className="mt-8 flex justify-center items-center space-x-2 space-x-reverse">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 rounded-lg border transition-colors ${
+                  currentPage === 1
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:bg-gray-50'
+                }`}
+                style={{ 
+                  borderColor: COLORS.border,
+                  color: COLORS.text,
+                  backgroundColor: COLORS.bg
+                }}
+              >
+                السابق
+              </button>
+              
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index + 1}
+                  onClick={() => handlePageChange(index + 1)}
+                  className={`px-4 py-2 rounded-lg border transition-colors ${
+                    currentPage === index + 1
+                      ? 'text-white'
+                      : 'hover:bg-gray-50'
+                  }`}
+                  style={{
+                    borderColor: COLORS.border,
+                    backgroundColor: currentPage === index + 1 ? COLORS.accent : COLORS.bg,
+                    color: currentPage === index + 1 ? 'white' : COLORS.text
+                  }}
+                >
+                  {index + 1}
+                </button>
+              ))}
+
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`px-4 py-2 rounded-lg border transition-colors ${
+                  currentPage === totalPages
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:bg-gray-50'
+                }`}
+                style={{ 
+                  borderColor: COLORS.border,
+                  color: COLORS.text,
+                  backgroundColor: COLORS.bg
+                }}
+              >
+                التالي
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Details Modal */}

@@ -7,9 +7,25 @@ const arabicAlphabet = ['أ', 'ب', 'ج', 'د', 'ه', 'و', 'ز', 'ح', 'ط', '�
 // Get all classes
 exports.getAllClasses = async (req, res) => {
   try {
-    const classes = await Class.find().sort({ level: 1, grade: 1, section: 1 });
+    const { populate } = req.query;
+    let query = Class.find().sort({ level: 1, grade: 1, section: 1 });
+
+    // Handle population if requested
+    if (populate) {
+      const populateFields = populate.split(',');
+      populateFields.forEach(field => {
+        if (field === 'teacher') {
+          query = query.populate('teacher');
+        } else if (field === 'schedule.teacher') {
+          query = query.populate('schedule.teacher');
+        }
+      });
+    }
+
+    const classes = await query;
     res.status(200).json(classes);
   } catch (error) {
+    console.error('Error in getAllClasses:', error);
     res.status(500).json({ message: error.message });
   }
 };

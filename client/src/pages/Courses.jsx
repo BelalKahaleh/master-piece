@@ -54,6 +54,9 @@ const levelGrades = {
   'ثانوي': ["العاشر", "الأول ثانوي", "الثاني ثانوي"]
 };
 
+const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'];
+const daysOfWeekArabic = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
+
 const Courses = () => {
   // Define COLORS object inside the component
   const COLORS = {
@@ -83,6 +86,12 @@ const Courses = () => {
   const [unassignedStudents, setUnassignedStudents] = useState([]);
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [loadingStudents, setLoadingStudents] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const classesPerPage = 3;
+  const [selectedDay, setSelectedDay] = useState(daysOfWeek[0]); // Default to Sunday
+  const [showClassDetailsModal, setShowClassDetailsModal] = useState(false);
+  const [selectedClassDetails, setSelectedClassDetails] = useState(null);
+  const [selectedDetailDay, setSelectedDetailDay] = useState(daysOfWeek[0]); // Add this new state
 
   const levels = [
     { value: 'ابتدائي', label: 'ابتدائي' },
@@ -131,29 +140,34 @@ const Courses = () => {
     return `ابتدائي ${grade}${arabicLetter}`;
   };
 
-  const generateTimeSlots = () => {
+  const generateFullWeekSchedule = () => {
     const slots = [];
-    let currentTime = new Date();
-    currentTime.setHours(8, 0, 0); // Start at 8:00 AM
+    for (let day of daysOfWeek) {
+      let currentTime = new Date();
+      currentTime.setHours(8, 0, 0); // 8:00 AM
 
-    for (let i = 1; i <= 7; i++) {
-      const startTime = new Date(currentTime);
-      const endTime = new Date(currentTime);
-      endTime.setMinutes(endTime.getMinutes() + 40); // 40 minutes class
+      for (let period = 1; period <= 7; period++) {
+        // Set start and end time for this period
+        const startTime = new Date(currentTime);
+        const endTime = new Date(currentTime);
+        endTime.setMinutes(endTime.getMinutes() + 40);
 
-      slots.push({
-        period: i,
-        startTime: startTime.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
-        endTime: endTime.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
-        teacher: '',
-        subject: ''
-      });
+        slots.push({
+          day,
+          period,
+          startTime: startTime.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
+          endTime: endTime.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
+          teacher: '',
+          subject: ''
+        });
 
-      // Add break time
-      if (i === 3) {
-        currentTime.setMinutes(currentTime.getMinutes() + 80); // 40 min class + 40 min break
-      } else {
-        currentTime.setMinutes(currentTime.getMinutes() + 45); // 40 min class + 5 min break
+        // Move currentTime forward for next period
+        if (period === 3) {
+          // Long break after period 3
+          currentTime.setMinutes(currentTime.getMinutes() + 80); // 40 min class + 40 min break
+        } else {
+          currentTime.setMinutes(currentTime.getMinutes() + 45); // 40 min class + 5 min break
+        }
       }
     }
     return slots;
@@ -163,7 +177,10 @@ const Courses = () => {
   const fetchClasses = async () => {
     try {
       // setLoading(true); // Optional: set a loading state for classes fetch
-      const classesResponse = await axios.get(`${API_BASE_URL}/classes`, { withCredentials: true });
+      const classesResponse = await axios.get(`${API_BASE_URL}/classes`, { 
+        params: { populate: 'teacher,schedule.teacher' },
+        withCredentials: true
+      });
       console.log('Classes fetched:', classesResponse.data);
       setClasses(classesResponse.data);
     } catch (error) {
@@ -248,7 +265,7 @@ const Courses = () => {
     };
 
     initializeData();
-    setSchedule(generateTimeSlots());
+    setSchedule(generateFullWeekSchedule());
   }, []);
 
   const handleNext = () => {
@@ -401,83 +418,101 @@ const Courses = () => {
               <span className="text-sm text-gray-500">مدة الحصة: 40 دقيقة</span>
             </div>
             
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الحصة</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">التوقيت</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">المعلم</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">المادة</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {schedule.map((slot, index) => (
-                    <React.Fragment key={slot.period}>
-                      <tr>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {slot.period}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {slot.startTime} - {slot.endTime}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <select
-                            className="w-full px-2 py-1 border border-gray-300 rounded-md text-right"
-                            value={slot.teacher || ''}
-                            onChange={(e) => {
-                              const newSchedule = [...schedule];
-                              const selectedTeacher = teachers.find(t => t._id === e.target.value);
-                              newSchedule[index] = {
-                                ...newSchedule[index],
-                                teacher: e.target.value,
-                                subject: selectedTeacher?.specialization || ''
-                              };
-                              setSchedule(newSchedule);
-                              console.log('Updated schedule:', newSchedule);
-                            }}
-                        >
-                          <option value="">اختر المعلم</option>
-                          {teachers.map((teacher) => (
-                            <option key={teacher._id} value={teacher._id}>
-                                {teacher.fullName} - {teacher.specialization}
-                            </option>
-                          ))}
-                        </select>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {slot.subject || 'لم يتم التحديد'}
-                        </td>
-                      </tr>
-                      {slot.period === 3 && (
-                        <tr className="bg-white">
-                          <td colSpan="4" className="px-6 py-3 text-center text-sm text-[#B17457] font-medium">
-                            استراحة طويلة (40 دقيقة)
-                          </td>
-                        </tr>
-                      )}
-                      {slot.period !== 3 && slot.period !== 7 && (
-                        <tr className="bg-gray-50">
-                          <td colSpan="4" className="px-6 py-1 text-center text-xs text-gray-500">
-                            استراحة قصيرة (5 دقائق)
-                          </td>
-                        </tr>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </tbody>
-              </table>
-                      </div>
+            <div className="flex gap-2 mb-4">
+              {daysOfWeek.map((day, idx) => (
+                <button
+                  key={day}
+                  className={`px-4 py-2 rounded ${selectedDay === day ? 'bg-[#B17457] text-white' : 'bg-[#FAF7F0] border border-[#D8D2C2]'}`}
+                  onClick={() => setSelectedDay(day)}
+                >
+                  {daysOfWeekArabic[idx]}
+                </button>
+              ))}
+            </div>
+
+            <div className="overflow-x-auto -mx-2 sm:mx-0">
+              <div className="min-w-full bg-white rounded-lg border border-[#D8D2C2] overflow-hidden shadow-sm">
+                <table className="min-w-full divide-y divide-[#D8D2C2]">
+                  <thead className="bg-[#FAF7F0]">
+                    <tr>
+                      <th className="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-right text-xs font-medium text-[#4A4947] uppercase tracking-wider">الحصة</th>
+                      <th className="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-right text-xs font-medium text-[#4A4947] uppercase tracking-wider">التوقيت</th>
+                      <th className="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-right text-xs font-medium text-[#4A4947] uppercase tracking-wider">المعلم</th>
+                      <th className="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-right text-xs font-medium text-[#4A4947] uppercase tracking-wider">المادة</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-[#D8D2C2]">
+                    {schedule
+                      .filter(slot => slot.day === selectedDay)
+                      .map((slot, index, arr) => (
+                        <React.Fragment key={slot.period}>
+                          <tr className={index % 2 === 0 ? 'bg-white' : 'bg-[#FAF7F0]'}>
+                            <td className="px-2 sm:px-4 md:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-[#4A4947]">
+                              {slot.period}
+                            </td>
+                            <td className="px-2 sm:px-4 md:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-[#4A4947]">
+                              {slot.startTime} - {slot.endTime}
+                            </td>
+                            <td className="px-2 sm:px-4 md:px-6 py-2 sm:py-4 whitespace-nowrap">
+                              <select
+                                className="w-full px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm border border-[#D8D2C2] rounded-lg focus:ring-2 focus:ring-[#B17457] focus:border-[#B17457] text-right bg-white"
+                                value={slot.teacher || ''}
+                                onChange={(e) => {
+                                  const newSchedule = [...schedule];
+                                  const slotIdx = newSchedule.findIndex(
+                                    s => s.day === selectedDay && s.period === slot.period
+                                  );
+                                  const selectedTeacher = teachers.find(t => t._id === e.target.value);
+                                  newSchedule[slotIdx] = {
+                                    ...newSchedule[slotIdx],
+                                    teacher: e.target.value,
+                                    subject: selectedTeacher?.specialization || ''
+                                  };
+                                  setSchedule(newSchedule);
+                                }}
+                              >
+                                <option value="">اختر المعلم</option>
+                                {teachers.map((teacher) => (
+                                  <option key={teacher._id} value={teacher._id}>
+                                    {teacher.fullName} - {teacher.specialization}
+                                  </option>
+                                ))}
+                              </select>
+                            </td>
+                            <td className="px-2 sm:px-4 md:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-[#4A4947]">
+                              {slot.subject || 'لم يتم التحديد'}
+                            </td>
+                          </tr>
+                          {slot.period === 3 && (
+                            <tr>
+                              <td colSpan={4} className="text-center text-[#B17457] font-medium">
+                                استراحة طويلة (40 دقيقة)
+                              </td>
+                            </tr>
+                          )}
+                          {slot.period !== 3 && slot.period !== 7 && (
+                            <tr>
+                              <td colSpan={4} className="text-center text-xs text-[#4A4947]">
+                                استراحة قصيرة (5 دقائق)
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
             <div className="mt-6 flex justify-end">
-                        <button
+              <button
                 onClick={handleCreateClass}
                 disabled={schedule.some(slot => !slot.teacher)}
                 className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed min-w-[150px]"
-                        >
+              >
                 <span>إنشاء الفصل</span>
-                        </button>
-                      </div>
+              </button>
+            </div>
 
             {schedule.some(slot => !slot.teacher) && (
               <p className="text-sm text-red-600 mt-2">
@@ -516,6 +551,7 @@ const Courses = () => {
         teacher: newClass.teacher,
         name: getClassName(newClass.level.trim(), newClass.number, true),
         schedule: schedule.map(slot => ({
+          day: slot.day,
           period: slot.period,
           startTime: slot.startTime,
           endTime: slot.endTime,
@@ -524,14 +560,14 @@ const Courses = () => {
         }))
       };
 
-      console.log('Sending class data to server:', JSON.stringify(classData, null, 2));
+      console.log('Class data being sent:', classData);
 
       const response = await axios.post(`${API_BASE_URL}/classes`, classData);
       console.log('Server response:', response.data);
       
       toast.success('تم إنشاء الفصل بنجاح');
       setNewClass({ level: '', number: '', teacher: '' });
-      setSchedule(generateTimeSlots());
+      setSchedule(generateFullWeekSchedule());
       setActiveStep(0);
       
       // Refresh classes list
@@ -584,6 +620,27 @@ const Courses = () => {
         toast.error(error.response?.data?.message || 'فشل في حذف الفصل');
       }
     }
+  };
+
+  // Calculate pagination
+  const indexOfLastClass = currentPage * classesPerPage;
+  const indexOfFirstClass = indexOfLastClass - classesPerPage;
+  const currentClasses = classes.slice(indexOfFirstClass, indexOfLastClass);
+  const totalPages = Math.ceil(classes.length / classesPerPage);
+
+  // Handle page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Reset to first page when classes change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [classes]);
+
+  const handleShowClassDetails = (classItem) => {
+    setSelectedClassDetails(classItem);
+    setShowClassDetailsModal(true);
   };
 
   return (
@@ -731,6 +788,18 @@ const Courses = () => {
                     </span>
                   </div>
 
+                  <div className="flex gap-2 mb-4">
+                    {daysOfWeek.map((day, idx) => (
+                      <button
+                        key={day}
+                        className={`px-4 py-2 rounded ${selectedDay === day ? 'bg-[#B17457] text-white' : 'bg-[#FAF7F0] border border-[#D8D2C2]'}`}
+                        onClick={() => setSelectedDay(day)}
+                      >
+                        {daysOfWeekArabic[idx]}
+                      </button>
+                    ))}
+                  </div>
+
                   <div className="overflow-x-auto -mx-2 sm:mx-0">
                     <div className="min-w-full bg-white rounded-lg border border-[#D8D2C2] overflow-hidden shadow-sm">
                       <table className="min-w-full divide-y divide-[#D8D2C2]">
@@ -743,58 +812,63 @@ const Courses = () => {
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-[#D8D2C2]">
-                          {schedule.map((slot, index) => (
-                            <React.Fragment key={slot.period}>
-                              <tr className={index % 2 === 0 ? 'bg-white' : 'bg-[#FAF7F0]'}>
-                                <td className="px-2 sm:px-4 md:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-[#4A4947]">
-                                  {slot.period}
-                                </td>
-                                <td className="px-2 sm:px-4 md:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-[#4A4947]">
-                                  {slot.startTime} - {slot.endTime}
-                                </td>
-                                <td className="px-2 sm:px-4 md:px-6 py-2 sm:py-4 whitespace-nowrap">
-                                  <select
-                                    className="w-full px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm border border-[#D8D2C2] rounded-lg focus:ring-2 focus:ring-[#B17457] focus:border-[#B17457] text-right bg-white"
-                                    value={slot.teacher || ''}
-                                    onChange={(e) => {
-                                      const newSchedule = [...schedule];
-                                      const selectedTeacher = teachers.find(t => t._id === e.target.value);
-                                      newSchedule[index] = {
-                                        ...newSchedule[index],
-                                        teacher: e.target.value,
-                                        subject: selectedTeacher?.specialization || ''
-                                      };
-                                      setSchedule(newSchedule);
-                                    }}
-                                  >
-                                    <option value="">اختر المعلم</option>
-                                    {teachers.map((teacher) => (
-                                      <option key={teacher._id} value={teacher._id}>
-                                        {teacher.fullName} - {teacher.specialization}
-                                      </option>
-                                    ))}
-                                  </select>
-                                </td>
-                                <td className="px-2 sm:px-4 md:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-[#4A4947]">
-                                  {slot.subject || 'لم يتم التحديد'}
-                                </td>
-                              </tr>
-                              {slot.period === 3 && (
-                                <tr className="bg-white">
-                                  <td colSpan="4" className="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-center text-xs sm:text-sm text-[#B17457] font-medium">
-                                    استراحة طويلة (40 دقيقة)
+                          {schedule
+                            .filter(slot => slot.day === selectedDay)
+                            .map((slot, index, arr) => (
+                              <React.Fragment key={slot.period}>
+                                <tr className={index % 2 === 0 ? 'bg-white' : 'bg-[#FAF7F0]'}>
+                                  <td className="px-2 sm:px-4 md:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-[#4A4947]">
+                                    {slot.period}
+                                  </td>
+                                  <td className="px-2 sm:px-4 md:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-[#4A4947]">
+                                    {slot.startTime} - {slot.endTime}
+                                  </td>
+                                  <td className="px-2 sm:px-4 md:px-6 py-2 sm:py-4 whitespace-nowrap">
+                                    <select
+                                      className="w-full px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm border border-[#D8D2C2] rounded-lg focus:ring-2 focus:ring-[#B17457] focus:border-[#B17457] text-right bg-white"
+                                      value={slot.teacher || ''}
+                                      onChange={(e) => {
+                                        const newSchedule = [...schedule];
+                                        const slotIdx = newSchedule.findIndex(
+                                          s => s.day === selectedDay && s.period === slot.period
+                                        );
+                                        const selectedTeacher = teachers.find(t => t._id === e.target.value);
+                                        newSchedule[slotIdx] = {
+                                          ...newSchedule[slotIdx],
+                                          teacher: e.target.value,
+                                          subject: selectedTeacher?.specialization || ''
+                                        };
+                                        setSchedule(newSchedule);
+                                      }}
+                                    >
+                                      <option value="">اختر المعلم</option>
+                                      {teachers.map((teacher) => (
+                                        <option key={teacher._id} value={teacher._id}>
+                                          {teacher.fullName} - {teacher.specialization}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </td>
+                                  <td className="px-2 sm:px-4 md:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-[#4A4947]">
+                                    {slot.subject || 'لم يتم التحديد'}
                                   </td>
                                 </tr>
-                              )}
-                              {slot.period !== 3 && slot.period !== 7 && (
-                                <tr className="bg-[#FAF7F0]">
-                                  <td colSpan="4" className="px-2 sm:px-4 md:px-6 py-1 sm:py-2 text-center text-xs text-[#4A4947]">
-                                    استراحة قصيرة (5 دقائق)
-                                  </td>
-                                </tr>
-                              )}
-                            </React.Fragment>
-                          ))}
+                                {slot.period === 3 && (
+                                  <tr>
+                                    <td colSpan={4} className="text-center text-[#B17457] font-medium">
+                                      استراحة طويلة (40 دقيقة)
+                                    </td>
+                                  </tr>
+                                )}
+                                {slot.period !== 3 && slot.period !== 7 && (
+                                  <tr>
+                                    <td colSpan={4} className="text-center text-xs text-[#4A4947]">
+                                      استراحة قصيرة (5 دقائق)
+                                    </td>
+                                  </tr>
+                                )}
+                              </React.Fragment>
+                            ))}
                         </tbody>
                       </table>
                     </div>
@@ -841,23 +915,24 @@ const Courses = () => {
         </div>
 
         {/* Existing Classes */}
-          <div className="mt-6 sm:mt-8 md:mt-12">
-            <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#4A4947] mb-3 sm:mb-4 md:mb-6">الفصول الموجودة</h3>
-            
-            {classes.length === 0 ? (
-              <div className="text-center py-6 sm:py-8 md:py-12">
-                <div className="rounded-lg bg-white p-4 sm:p-6 md:p-12 shadow-sm border border-[#D8D2C2]">
-                  <UserGroupIcon className="mx-auto h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-[#B17457]" />
-                  <h3 className="mt-2 text-sm sm:text-base md:text-lg font-medium text-[#4A4947]">لا توجد فصول دراسية</h3>
-                  <p className="mt-1 text-xs sm:text-sm text-[#4A4947]">قم بإنشاء فصل جديد للبدء</p>
-                </div>
+        <div className="mt-6 sm:mt-8 md:mt-12">
+          <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#4A4947] mb-3 sm:mb-4 md:mb-6">الفصول الموجودة</h3>
+          
+          {classes.length === 0 ? (
+            <div className="text-center py-6 sm:py-8 md:py-12">
+              <div className="rounded-lg bg-white p-4 sm:p-6 md:p-12 shadow-sm border border-[#D8D2C2]">
+                <UserGroupIcon className="mx-auto h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-[#B17457]" />
+                <h3 className="mt-2 text-sm sm:text-base md:text-lg font-medium text-[#4A4947]">لا توجد فصول دراسية</h3>
+                <p className="mt-1 text-xs sm:text-sm text-[#4A4947]">قم بإنشاء فصل جديد للبدء</p>
+              </div>
             </div>
           ) : (
+            <div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
-              {classes.map((classItem) => (
+                {currentClasses.map((classItem) => (
                   <div key={classItem._id} className="bg-white rounded-lg shadow-sm border border-[#D8D2C2] hover:shadow-md transition-shadow duration-200">
                     <div className="p-3 sm:p-4 md:p-6">
-                  <div className="flex justify-between items-start">
+                      <div className="flex justify-between items-start">
                         <div>
                           <h4 className="text-sm sm:text-base md:text-lg font-medium text-[#4A4947]">
                             {classItem.name || getClassName(classItem.level, classItem.grade)}
@@ -868,29 +943,89 @@ const Courses = () => {
                             </p>
                           )}
                         </div>
-                    <button
-                      onClick={() => handleDeleteClass(classItem._id)}
+                        <button
+                          onClick={() => handleDeleteClass(classItem._id)}
                           className="text-[#D8D2C2] hover:text-[#B17457] focus:outline-none transition-colors duration-200"
                         >
                           <TrashIcon className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
                         </button>
                       </div>
-                      {/* New Assign Students Button */}
                       <div className="px-3 sm:px-4 md:px-6 py-2 bg-[#FAF7F0] border-t border-[#D8D2C2]">
-                        <button
-                          onClick={() => {
-                            setSelectedClassToAssign(classItem);
-                            setShowAssignStudentsModal(true);
-                            fetchUnassignedStudents(classItem.level);
-                          }}
-                          className="w-full text-center text-xs sm:text-sm font-medium text-[#B17457] hover:text-[#965c44] focus:outline-none transition-colors duration-200"
-                        >
-                          تعيين طلاب للفصل
-                    </button>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            onClick={() => {
+                              setSelectedClassToAssign(classItem);
+                              setShowAssignStudentsModal(true);
+                              fetchUnassignedStudents(classItem.level);
+                            }}
+                            className="w-full text-center text-xs sm:text-sm font-medium text-[#B17457] hover:text-[#965c44] focus:outline-none transition-colors duration-200"
+                          >
+                            تعيين طلاب للفصل
+                          </button>
+                          <button
+                            onClick={() => handleShowClassDetails(classItem)}
+                            className="w-full text-center text-xs sm:text-sm font-medium text-[#B17457] hover:text-[#965c44] focus:outline-none transition-colors duration-200"
+                          >
+                            عرض تفاصيل الفصل
+                          </button>
+                        </div>
                       </div>
+                    </div>
                   </div>
+                ))}
+              </div>
+
+              {/* Pagination Controls */}
+              {classes.length > 0 && (
+                <div className="mt-8 flex justify-center items-center space-x-2 space-x-reverse">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`px-4 py-2 rounded-lg border transition-colors ${
+                      currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'
+                    }`}
+                    style={{ 
+                      borderColor: COLORS.border,
+                      color: COLORS.text,
+                      backgroundColor: COLORS.bg
+                    }}
+                  >
+                    السابق
+                  </button>
+                  
+                  {[...Array(totalPages)].map((_, index) => (
+                    <button
+                      key={index + 1}
+                      onClick={() => handlePageChange(index + 1)}
+                      className={`px-4 py-2 rounded-lg border transition-colors ${
+                        currentPage === index + 1 ? 'text-white' : 'hover:bg-gray-50'
+                      }`}
+                      style={{
+                        borderColor: COLORS.border,
+                        backgroundColor: currentPage === index + 1 ? COLORS.accent : COLORS.bg,
+                        color: currentPage === index + 1 ? 'white' : COLORS.text
+                      }}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`px-4 py-2 rounded-lg border transition-colors ${
+                      currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'
+                    }`}
+                    style={{ 
+                      borderColor: COLORS.border,
+                      color: COLORS.text,
+                      backgroundColor: COLORS.bg
+                    }}
+                  >
+                    التالي
+                  </button>
                 </div>
-              ))}
+              )}
             </div>
           )}
         </div>
@@ -962,6 +1097,129 @@ const Courses = () => {
                   </div>
                 </>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Class Details Modal */}
+      {showClassDetailsModal && selectedClassDetails && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50 flex justify-center items-center px-4">
+          <div className="relative p-8 border rounded-2xl shadow-2xl w-full max-w-6xl bg-[#FAF7F0] flex flex-col md:flex-row gap-8" style={{ borderColor: COLORS.border }}>
+            {/* Left: Schedule */}
+            <div className="flex-1 min-w-0">
+              <div className="bg-white rounded-2xl shadow-md border border-[#D8D2C2] p-6">
+                <div className="flex flex-col items-center mb-6">
+                  <h4 className="text-2xl font-bold mb-4 text-[#4A4947]">جدول الحصص</h4>
+                  <div className="flex flex-wrap justify-center gap-2 mb-2">
+                    {daysOfWeek.map((day, idx) => (
+                      <button
+                        key={day}
+                        onClick={() => setSelectedDetailDay(day)}
+                        className={`px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200 border ${
+                          selectedDetailDay === day 
+                            ? 'bg-[#B17457] text-white border-[#B17457]' 
+                            : 'bg-[#FAF7F0] text-[#4A4947] border-[#D8D2C2] hover:bg-[#D8D2C2]'
+                        }`}
+                        style={{ minWidth: 90 }}
+                      >
+                        {daysOfWeekArabic[idx]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  {(() => {
+                    const daySchedule = selectedClassDetails.schedule.filter(slot => slot.day === selectedDetailDay);
+                    if (daySchedule.length === 0) {
+                      return (
+                        <div className="text-center py-8 bg-[#FAF7F0] rounded-lg">
+                          <p className="text-[#4A4947]">لا توجد حصص في هذا اليوم</p>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y" style={{ borderColor: COLORS.border }}>
+                          <thead className="sticky top-0 z-10 bg-[#FAF7F0]">
+                            <tr>
+                              <th className="px-6 py-3 text-right text-base font-bold" style={{ color: COLORS.text }}>الحصة</th>
+                              <th className="px-6 py-3 text-right text-base font-bold" style={{ color: COLORS.text }}>المادة</th>
+                              <th className="px-6 py-3 text-right text-base font-bold" style={{ color: COLORS.text }}>المعلم</th>
+                              <th className="px-6 py-3 text-right text-base font-bold" style={{ color: COLORS.text }}>التوقيت</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y" style={{ borderColor: COLORS.border }}>
+                            {daySchedule.map((slot, index) => (
+                              <React.Fragment key={slot.period}>
+                                <tr className={index % 2 === 0 ? 'bg-white' : 'bg-[#FAF7F0]'}>
+                                  <td className="px-6 py-3 text-base" style={{ color: COLORS.text }}>
+                                    {slot.period}
+                                  </td>
+                                  <td className="px-6 py-3 text-base" style={{ color: COLORS.text }}>
+                                    {slot.subject}
+                                  </td>
+                                  <td className="px-6 py-3 text-base" style={{ color: COLORS.text }}>
+                                    {teachers.find(t => t._id === slot.teacher)?.fullName || 'غير محدد'}
+                                  </td>
+                                  <td className="px-6 py-3 text-base" style={{ color: COLORS.text }}>
+                                    {slot.startTime} - {slot.endTime}
+                                  </td>
+                                </tr>
+                                {slot.period === 3 && (
+                                  <tr>
+                                    <td colSpan={4} className="text-center text-[#B17457] font-bold bg-[#FAF7F0] text-base">
+                                      استراحة طويلة (40 دقيقة)
+                                    </td>
+                                  </tr>
+                                )}
+                                {slot.period !== 3 && slot.period !== 7 && (
+                                  <tr>
+                                    <td colSpan={4} className="text-center text-xs text-[#4A4947] bg-[#FAF7F0]">
+                                      استراحة قصيرة (5 دقائق)
+                                    </td>
+                                  </tr>
+                                )}
+                              </React.Fragment>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            </div>
+            {/* Right: Info */}
+            <div className="w-full md:w-96 flex flex-col gap-8 justify-between">
+              <div>
+                <div className="bg-white rounded-2xl shadow-md border border-[#D8D2C2] p-6 mb-4">
+                  <h4 className="text-xl font-bold mb-4 text-[#4A4947]">معلومات الفصل</h4>
+                  <div className="space-y-3 text-base">
+                    <p><span className="font-semibold">المستوى:</span> {selectedClassDetails.level}</p>
+                    <p><span className="font-semibold">الصف:</span> {selectedClassDetails.grade}</p>
+                    <p><span className="font-semibold">المعلم المسؤول:</span> {teachers.find(t => t._id === selectedClassDetails.teacher)?.fullName || 'غير محدد'}</p>
+                  </div>
+                </div>
+                <div className="bg-white rounded-2xl shadow-md border border-[#D8D2C2] p-6">
+                  <h4 className="text-xl font-bold mb-4 text-[#4A4947]">المواد الدراسية</h4>
+                  <ul className="list-disc pr-5 space-y-2 text-base">
+                    {Array.from(new Set(selectedClassDetails.schedule.map(slot => slot.subject))).map((subject, index) => (
+                      <li key={index}>{subject}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              {/* Close Button at the bottom left */}
+              <div className="mt-8 flex justify-start">
+                <button
+                  onClick={() => setShowClassDetailsModal(false)}
+                  className="px-6 py-2 text-white text-base font-medium rounded-md shadow-sm transition-colors duration-200 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 w-full md:w-auto"
+                  style={{ backgroundColor: COLORS.accent, '--tw-ring-color': COLORS.accent }}
+                >
+                  إغلاق
+                </button>
+              </div>
             </div>
           </div>
         </div>

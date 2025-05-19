@@ -25,6 +25,7 @@ const classSchema = new mongoose.Schema({
     required: true
   },
   schedule: [{
+    day: { type: String, required: true },
     period: { type: Number, required: true },
     startTime: { type: String, required: true },
     endTime: { type: String, required: true },

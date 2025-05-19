@@ -97,8 +97,6 @@ export default function TeacherProfile() {
     const teacherId = teacherData._id;
 
     try {
-      // Assuming a PUT endpoint for password change exists like /api/teachers/:id/password
-      // NOTE: This endpoint still needs to be implemented on the backend
       const res = await axios.put(`${API_URL}/${teacherId}/password`, { 
         currentPassword: passwordForm.currentPassword, 
         newPassword: passwordForm.newPassword 
@@ -114,17 +112,16 @@ export default function TeacherProfile() {
         setShowPasswordModal(false);
         setPasswordForm({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
       } else {
-           // Handle backend specific errors like invalid current password
-           setPasswordError(res.data.message || 'Failed to change password.');
+        // Handle backend specific errors like invalid current password
+        setPasswordError(res.data.message || 'Failed to change password.');
       }
-
     } catch (err) {
       console.error('Error changing password:', err);
       setPasswordError(err.response?.data?.message || 'Failed to change password.');
-        // Redirect to login if API call fails (e.g., token expired)
-        if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-            navigate('/teacher/login');
-        }
+      // Redirect to login if API call fails (e.g., token expired)
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        navigate('/teacher/login');
+      }
     }
   };
 

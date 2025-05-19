@@ -15,6 +15,8 @@ const Messages = () => {
   const [reply, setReply] = useState('')
   const [showReply, setShowReply] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const messagesPerPage = 3
 
   useEffect(() => {
     fetchAll()
@@ -93,6 +95,22 @@ const Messages = () => {
     filter === 'all'
       ? list
       : list.filter(m => (filter === 'read' ? m.read : !m.read))
+
+  // Calculate pagination
+  const indexOfLastMessage = currentPage * messagesPerPage
+  const indexOfFirstMessage = indexOfLastMessage - messagesPerPage
+  const currentMessages = filtered.slice(indexOfFirstMessage, indexOfLastMessage)
+  const totalPages = Math.ceil(filtered.length / messagesPerPage)
+
+  // Handle page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber)
+  }
+
+  // Reset to first page when filter changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filter])
 
   const handleDelete = async (id) => {
     try {
@@ -179,7 +197,7 @@ const Messages = () => {
               <p className="text-[#4A4947]">لا توجد رسائل</p>
             </div>
           ) : (
-            filtered.map(m => (
+            currentMessages.map(m => (
               <div
                 key={m._id}
                 className={`p-4 rounded-lg shadow border ${
@@ -225,6 +243,65 @@ const Messages = () => {
             ))
           )}
         </div>
+
+        {/* Pagination Controls */}
+        {filtered.length > 0 && (
+          <div className="mt-8 flex justify-center items-center space-x-2 space-x-reverse">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 rounded-lg border transition-colors ${
+                currentPage === 1
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'hover:bg-gray-50'
+              }`}
+              style={{ 
+                borderColor: '#D8D2C2',
+                color: '#4A4947',
+                backgroundColor: '#FAF7F0'
+              }}
+            >
+              السابق
+            </button>
+            
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index + 1}
+                onClick={() => handlePageChange(index + 1)}
+                className={`px-4 py-2 rounded-lg border transition-colors ${
+                  currentPage === index + 1
+                    ? 'text-white'
+                    : 'hover:bg-gray-50'
+                }`}
+                style={{
+                  borderColor: '#D8D2C2',
+                  backgroundColor: currentPage === index + 1 ? '#B17457' : '#FAF7F0',
+                  color: currentPage === index + 1 ? 'white' : '#4A4947'
+                }}
+              >
+                {index + 1}
+              </button>
+            ))}
+
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 rounded-lg border transition-colors ${
+                currentPage === totalPages
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'hover:bg-gray-50'
+              }`}
+              style={{ 
+                borderColor: '#D8D2C2',
+                color: '#4A4947',
+                backgroundColor: '#FAF7F0'
+              }}
+            >
+              التالي
+            </button>
+          </div>
+        )}
+
         {/* Detail Modal (no reply button) */}
         {detail && (
           <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setDetail(null)}>
