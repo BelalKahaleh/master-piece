@@ -187,11 +187,32 @@ const updateTeacherPassword = async (req, res) => {
   }
 };
 
+// GET /api/teachers/me - Get current teacher's information
+const getCurrentTeacher = async (req, res) => {
+  try {
+    // The teacher ID should be available in req.user from the auth middleware
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+
+    const teacher = await Teacher.findById(req.user.id).select('-password');
+    if (!teacher) {
+      return res.status(404).json({ message: 'Teacher not found' });
+    }
+
+    res.json(teacher);
+  } catch (err) {
+    console.error('Error fetching current teacher:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // Export existing and new functions
 module.exports = {
   getTeachers,
   createTeacher,
   loginTeacher,
   getTeacherById,
-  updateTeacherPassword
+  updateTeacherPassword,
+  getCurrentTeacher
 };

@@ -2,6 +2,25 @@ const express = require('express')
 const multer  = require('multer')
 const ctrl    = require('../controller/teacherController')
 const router  = express.Router()
+const jwt     = require('jsonwebtoken')
+
+// Authentication middleware
+const auth = async (req, res, next) => {
+  try {
+    const token = req.cookies.teacherToken;
+    
+    if (!token) {
+      return res.status(401).json({ message: 'No authentication token' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    req.user = decoded;
+    next();
+  } catch (err) {
+    console.error('Auth middleware error:', err);
+    res.status(401).json({ message: 'Invalid token' });
+  }
+};
 
 // simple disk storage
 const storage = multer.diskStorage({
@@ -25,6 +44,9 @@ router.post(
 
 // Teacher login
 router.post('/login', ctrl.loginTeacher)
+
+// Get current teacher info (protected route)
+router.get('/me', auth, ctrl.getCurrentTeacher)
 
 // Get single teacher by ID
 router.get('/:id', ctrl.getTeacherById);
