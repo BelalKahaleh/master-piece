@@ -222,3 +222,26 @@ exports.assignStudents = async (req, res) => {
     res.status(500).json({ message: 'Failed to assign students' });
   }
 };
+
+// Get students for a specific class
+exports.getClassStudents = async (req, res) => {
+  try {
+    const classId = req.params.id;
+    
+    // Find the class first to verify it exists
+    const classItem = await Class.findById(classId);
+    if (!classItem) {
+      return res.status(404).json({ message: 'Class not found' });
+    }
+
+    // Find all students in this class
+    const students = await Student.find({ class: classId })
+      .select('-password') // Exclude password
+      .sort({ fullName: 1 }); // Sort by name
+
+    res.status(200).json(students);
+  } catch (error) {
+    console.error('Error in getClassStudents:', error);
+    res.status(500).json({ message: 'Failed to fetch class students' });
+  }
+};

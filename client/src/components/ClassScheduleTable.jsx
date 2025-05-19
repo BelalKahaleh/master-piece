@@ -148,18 +148,18 @@ const ClassScheduleTable = () => {
   };
 
   return (
-    <div className="p-4 bg-[#F5F3EF] min-h-screen">
+    <div className="p-4 bg-[#F5F3EF] min-h-screen" dir="rtl">
       {/* Teacher's Schedule Summary */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-4 text-[#4A4947]">جدول حصصي</h2>
-        <div className="bg-white rounded-xl shadow-md border border-[#D8D2C2] p-6 flex flex-col md:flex-row items-center gap-6">
-          <div className="flex items-center gap-4">
+        <h2 className="text-2xl font-bold mb-4 text-[#4A4947] text-right">جدول حصصي</h2>
+        <div className="bg-white rounded-xl shadow-md border border-[#D8D2C2] p-6 flex flex-col md:flex-row items-center gap-6 md:flex-row-reverse">
+          <div className="flex items-center gap-4 md:flex-row-reverse">
             <div className="bg-[#B17457] text-white rounded-full p-4 text-3xl shadow-md">
               <FaChalkboardTeacher />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-[#4A4947] mb-1">{currentTeacher.fullName}</h3>
-              <p className="text-[#B17457] font-medium">{currentTeacher.specialization}</p>
+              <h3 className="text-xl font-bold text-[#4A4947] mb-1 text-right">{currentTeacher.fullName}</h3>
+              <p className="text-[#B17457] font-medium text-right">{currentTeacher.specialization}</p>
             </div>
           </div>
         </div>
@@ -167,8 +167,8 @@ const ClassScheduleTable = () => {
 
       {/* Schedule Table Section */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-4 text-[#4A4947]">جدول الحصص</h2>
-        <div className="flex gap-2 mb-4 flex-wrap justify-center">
+        <h2 className="text-2xl font-bold mb-4 text-[#4A4947] text-right">جدول الحصص</h2>
+        <div className="flex gap-2 mb-4 flex-wrap justify-center md:justify-end">
           {daysOfWeek.map((day, idx) => (
             <button
               key={day}
@@ -186,7 +186,7 @@ const ClassScheduleTable = () => {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded-xl border border-[#D8D2C2] shadow-md text-center">
+        <table className="min-w-full bg-white rounded-xl border border-[#D8D2C2] shadow-md text-center" dir="rtl">
           <thead className="bg-[#FAF7F0]">
             <tr>
               <th className="px-6 py-3 text-center text-base font-bold text-[#4A4947] border-b border-[#D8D2C2]">الحصة</th>
@@ -208,9 +208,7 @@ const ClassScheduleTable = () => {
                     }
                   >
                     <td className="px-6 py-4 text-lg font-bold text-[#4A4947]">{period}</td>
-                    <td className="px-6 py-4 text-base font-semibold text-[#4A4947] tracking-wide">
-                      {`${times.start} - ${times.end}`}
-                    </td>
+                    <td className="px-6 py-4 text-base font-semibold text-[#4A4947] tracking-wide">{`${times.start} - ${times.end}`}</td>
                     <td className="px-6 py-4 text-base">
                       {slot.type === 'class' ? (
                         <div className="flex flex-col items-center gap-1 bg-[#FFF7F2] border border-[#B17457] rounded-lg p-2 shadow-sm">

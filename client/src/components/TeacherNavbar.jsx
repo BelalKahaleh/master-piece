@@ -10,8 +10,8 @@ const TeacherNavbar = () => {
   const navItems = [
     { to: "/teacher/teacherProfile", icon: "👨‍🎓", label: "الملف الشخصي" },
     { to: "/teacher/coursesTeacher", icon: "👨‍🏫", label: "الجدول" },
-    { to: "/teacher/examTeacher", icon: "📚", label: "الامتحانات" },
-    { to: "/teacher/marksTeacher", icon: "📰", label: "العلامات" },
+    { to: "/teacher/QuizManager", icon: "📚", label: "الامتحانات" },
+    { to: "/teacher/TeacherMark", icon: "📰", label: "العلامات" },
     { to: "/teacher/teacherGuide", icon: "✉️", label: "دليل معلم" }
   ];
 

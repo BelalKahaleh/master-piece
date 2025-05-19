@@ -12,6 +12,7 @@ const authRoutes = require('./route/adminAuthRoute');
 const newsRoutes = require('./route/newsRoute');
 const classRoutes = require('./route/classRoute');
 const teacherRoutes = require('./route/teacherRoute');
+const quizRoutes = require('./route/quizRoute');
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ app.use('/api/news', newsRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/teachers', teacherRoutes);
+app.use('/api/quizzes', quizRoutes);
 
 // Create uploads directory if it doesn't exist
 const fs = require('fs');

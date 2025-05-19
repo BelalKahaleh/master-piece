@@ -4,9 +4,9 @@ import { Route, Routes, Navigate, Outlet } from "react-router-dom";
 import TeacherNavbar from "./components/TeacherNavbar";
 import TeacherProfile from "./pages/teacher/teacherProfile";
 import CoursesTeacher from "./pages/teacher/CoursesTeacher";
-// import TeacherExam from "./pages/teacher/teacherExam";
-// import TeacherMark from "./pages/teacher/teacherMark";
-// import TeacherGuide from "./pages/teacher/teacherGuide";
+import QuizManager from "./pages/teacher/QuizManager";
+import TeacherMark from "./pages/teacher/teacherMark";
+import TeacherGuide from "./pages/teacher/TeacherGuide";
 
 export default function TeacherDashboard() {
   return (
@@ -25,9 +25,9 @@ export default function TeacherDashboard() {
 
           {/* Add routes for other teacher pages, e.g., */}
           <Route path="coursesTeacher" element={<CoursesTeacher />} />
-          {/* <Route path="examTeacher" element={<TeacherExam />} /> */}
-          {/* <Route path="marksTeacher" element={<TeacherMark />} /> */}
-          {/* <Route path="teacherGuide" element={<TeacherGuide />} /> */}
+          <Route path="QuizManager" element={<QuizManager />} />
+          <Route path="TeacherMark" element={<TeacherMark />} />
+          <Route path="teacherGuide" element={<TeacherGuide />} />
 
           {/* Optional: Redirect from the base /teacher route to a default nested route */}
           {/* <Route index element={<Navigate to="teacherProfile" replace />} /> */}
