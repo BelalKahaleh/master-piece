@@ -1,6 +1,7 @@
 // File: src/pages/Admin/AdminLogin.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import HomeLinkButton from '../components/HomeLinkButton';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -30,33 +31,27 @@ const AdminLogin = () => {
       });
       
       const data = await res.json();
-      console.log("Login response:", data); // Debug log
+      console.log("Login response:", data);
 
       if (res.ok) {
-        // Store user data in localStorage
-        const userData = {
-          ...data,
-          role: "admin" // Ensure role is set
-        };
-        console.log("Storing user data:", userData); // Debug log
-        localStorage.setItem("user", JSON.stringify(userData));
-        
         // Navigate to admin dashboard
-        console.log("Navigating to /admin/students"); // Debug log
         navigate("/admin/students", { replace: true });
       } else {
         setError(data.message || "بيانات الاعتماد غير صحيحة");
       }
     } catch (err) {
-      console.error("Login error:", err); // Debug log
+      console.error("Login error:", err);
       setError("خطأ في الاتصال بالخادم");
-    } finally { 
-      setLoading(false); 
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <section className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: colors.bg }} dir="rtl">
+    <section className="min-h-screen flex items-center justify-center px-4 relative" style={{ backgroundColor: colors.bg }} dir="rtl">
+      <div style={{ position: 'absolute', top: 24, left: 24, zIndex: 10 }}>
+        <HomeLinkButton onClick={() => navigate('/')} />
+      </div>
       <div className="w-full max-w-md p-8 rounded-2xl shadow-xl border-t-4 border" style={{ backgroundColor: colors.card, borderColor: colors.accent, boxShadow: '0 8px 32px rgba(177, 116, 87, 0.10)' }}>
         <div className="flex justify-center mb-6">
           <div className="bg-[#FAF7F0] rounded-full p-3 shadow" style={{ border: `2px solid ${colors.accent}` }}>

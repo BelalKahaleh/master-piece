@@ -23,4 +23,13 @@ router.post(
   ctrl.createTeacher
 )
 
+// Teacher login
+router.post('/login', ctrl.loginTeacher)
+
+// Get single teacher by ID
+router.get('/:id', ctrl.getTeacherById);
+
+// Add route for updating teacher password
+router.put('/:id/password', ctrl.updateTeacherPassword);
+
 module.exports = router

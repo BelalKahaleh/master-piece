@@ -34,13 +34,25 @@ const SidebarAdmin = ({ sidebarOpen, setSidebarOpen }) => {
     }
   };
 
-  const handleLogout = () => {
-    setIsTransitioning(true);
-    setTimeout(() => {
-      navigate("/adminLogin");
+  const handleLogout = async () => {
+    try {
+      setIsTransitioning(true);
+      const response = await fetch("http://localhost:5000/api/admin/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        setTimeout(() => {
+          navigate("/adminLogin", { replace: true });
+          setIsTransitioning(false);
+          if (setSidebarOpen) setSidebarOpen(false);
+        }, 300);
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
       setIsTransitioning(false);
-      if (setSidebarOpen) setSidebarOpen(false);
-    }, 300);
+    }
   };
 
   return (

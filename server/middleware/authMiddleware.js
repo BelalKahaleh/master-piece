@@ -23,13 +23,31 @@ exports.protect = async (req, res, next) => {
       });
     }
 
-    // 4. Grant access to protected route
+    // 4. Check if user has admin role
+    if (admin.role !== 'admin') {
+      return res.status(403).json({
+        message: 'غير مصرح بالوصول - يجب أن تكون مسؤولاً'
+      });
+    }
+
+    // 5. Grant access to protected route
     req.user = admin;
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);
     res.status(401).json({
       message: 'غير مصرح بالوصول'
+    });
+  }
+};
+
+// New middleware specifically for admin routes
+exports.restrictToAdmin = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    res.status(403).json({
+      message: 'غير مصرح بالوصول - يجب أن تكون مسؤولاً'
     });
   }
 }; 

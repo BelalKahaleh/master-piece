@@ -286,15 +286,15 @@ const Courses = () => {
   const handleSubjectChange = (index, field, value) => {
     if (field === 'teacher') {
       const selectedTeacher = teachers.find(t => t._id === value);
-      const updatedSubjects = [...newClass.subjects];
+    const updatedSubjects = [...newClass.subjects];
       updatedSubjects[index] = {
         name: selectedTeacher.specialization,
         teacher: value
       };
-      setNewClass({
-        ...newClass,
-        subjects: updatedSubjects
-      });
+    setNewClass({
+      ...newClass,
+      subjects: updatedSubjects
+    });
     }
   };
 
@@ -400,7 +400,7 @@ const Courses = () => {
               <h2 className="text-xl font-semibold text-gray-800">جدول الحصص اليومي</h2>
               <span className="text-sm text-gray-500">مدة الحصة: 40 دقيقة</span>
             </div>
-
+            
             <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
@@ -422,7 +422,7 @@ const Courses = () => {
                           {slot.startTime} - {slot.endTime}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          <select
+                        <select
                             className="w-full px-2 py-1 border border-gray-300 rounded-md text-right"
                             value={slot.teacher || ''}
                             onChange={(e) => {
@@ -436,14 +436,14 @@ const Courses = () => {
                               setSchedule(newSchedule);
                               console.log('Updated schedule:', newSchedule);
                             }}
-                          >
-                            <option value="">اختر المعلم</option>
-                            {teachers.map((teacher) => (
-                              <option key={teacher._id} value={teacher._id}>
+                        >
+                          <option value="">اختر المعلم</option>
+                          {teachers.map((teacher) => (
+                            <option key={teacher._id} value={teacher._id}>
                                 {teacher.fullName} - {teacher.specialization}
-                              </option>
-                            ))}
-                          </select>
+                            </option>
+                          ))}
+                        </select>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {slot.subject || 'لم يتم التحديد'}
@@ -467,17 +467,17 @@ const Courses = () => {
                   ))}
                 </tbody>
               </table>
-            </div>
+                      </div>
 
             <div className="mt-6 flex justify-end">
-              <button
+                        <button
                 onClick={handleCreateClass}
                 disabled={schedule.some(slot => !slot.teacher)}
                 className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed min-w-[150px]"
-              >
+                        >
                 <span>إنشاء الفصل</span>
-              </button>
-            </div>
+                        </button>
+                      </div>
 
             {schedule.some(slot => !slot.teacher) && (
               <p className="text-sm text-red-600 mt-2">
@@ -619,7 +619,7 @@ const Courses = () => {
               <div className="px-2 sm:px-4 md:px-6 py-3 sm:py-4">
                 <nav className="flex justify-center" aria-label="Progress">
                   <ol className="flex items-center w-full max-w-4xl">
-                    {steps.map((step, index) => (
+                {steps.map((step, index) => (
                       <li key={step} className="relative flex-1">
                         <div className="flex items-center">
                           <div className={`flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center
@@ -630,10 +630,10 @@ const Courses = () => {
                           </div>
                           <div className={`mr-1 sm:mr-2 md:mr-4 flex-1 ${index !== steps.length - 1 ? 'border-t-2' : ''} 
                             ${activeStep > index ? 'border-[#B17457]' : 'border-[#D8D2C2]'}`} />
-                        </div>
+                    </div>
                         <div className="mt-1 sm:mt-2 text-xs sm:text-sm font-medium text-[#4A4947] text-center">
                           {step}
-                        </div>
+                  </div>
                       </li>
                     ))}
                   </ol>
@@ -799,48 +799,48 @@ const Courses = () => {
                       </table>
                     </div>
                   </div>
-                </div>
+              </div>
               )}
             </div>
 
             {/* Navigation */}
             <div className="px-2 sm:px-4 md:px-6 py-3 sm:py-4 bg-[#FAF7F0] border-t border-[#D8D2C2]">
               <div className="flex justify-between">
-                <button
-                  onClick={handleBack}
-                  disabled={activeStep === 0}
+              <button
+                onClick={handleBack}
+                disabled={activeStep === 0}
                   className="inline-flex items-center px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-[#4A4947] bg-white border border-[#D8D2C2] rounded-md hover:bg-[#D8D2C2] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#B17457] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                >
+              >
                   <ChevronLeftIcon className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-                  السابق
-                </button>
-                
-                {activeStep === steps.length - 1 ? (
-                  <button
-                    onClick={handleCreateClass}
+                السابق
+              </button>
+              
+              {activeStep === steps.length - 1 ? (
+                <button
+                  onClick={handleCreateClass}
                     disabled={schedule.some(slot => !slot.teacher)}
                     className="inline-flex items-center px-3 sm:px-6 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-[#B17457] rounded-md hover:bg-[#965c44] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#B17457] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                   >
-                    إنشاء الفصل
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleNext}
-                    disabled={
-                      (activeStep === 0 && (!newClass.level || !newClass.number)) ||
-                      (activeStep === 1 && !newClass.teacher)
-                    }
+                  إنشاء الفصل
+                </button>
+              ) : (
+                <button
+                  onClick={handleNext}
+                  disabled={
+                    (activeStep === 0 && (!newClass.level || !newClass.number)) ||
+                    (activeStep === 1 && !newClass.teacher)
+                  }
                     className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-[#B17457] rounded-md hover:bg-[#965c44] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#B17457] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                  >
-                    التالي
+                >
+                  التالي
                     <ChevronRightIcon className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-                  </button>
-                )}
-              </div>
+                </button>
+              )}
             </div>
           </div>
+        </div>
 
-          {/* Existing Classes */}
+        {/* Existing Classes */}
           <div className="mt-6 sm:mt-8 md:mt-12">
             <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#4A4947] mb-3 sm:mb-4 md:mb-6">الفصول الموجودة</h3>
             
@@ -851,13 +851,13 @@ const Courses = () => {
                   <h3 className="mt-2 text-sm sm:text-base md:text-lg font-medium text-[#4A4947]">لا توجد فصول دراسية</h3>
                   <p className="mt-1 text-xs sm:text-sm text-[#4A4947]">قم بإنشاء فصل جديد للبدء</p>
                 </div>
-              </div>
-            ) : (
+            </div>
+          ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
-                {classes.map((classItem) => (
+              {classes.map((classItem) => (
                   <div key={classItem._id} className="bg-white rounded-lg shadow-sm border border-[#D8D2C2] hover:shadow-md transition-shadow duration-200">
                     <div className="p-3 sm:p-4 md:p-6">
-                      <div className="flex justify-between items-start">
+                  <div className="flex justify-between items-start">
                         <div>
                           <h4 className="text-sm sm:text-base md:text-lg font-medium text-[#4A4947]">
                             {classItem.name || getClassName(classItem.level, classItem.grade)}
@@ -868,8 +868,8 @@ const Courses = () => {
                             </p>
                           )}
                         </div>
-                        <button
-                          onClick={() => handleDeleteClass(classItem._id)}
+                    <button
+                      onClick={() => handleDeleteClass(classItem._id)}
                           className="text-[#D8D2C2] hover:text-[#B17457] focus:outline-none transition-colors duration-200"
                         >
                           <TrashIcon className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
@@ -886,15 +886,15 @@ const Courses = () => {
                           className="w-full text-center text-xs sm:text-sm font-medium text-[#B17457] hover:text-[#965c44] focus:outline-none transition-colors duration-200"
                         >
                           تعيين طلاب للفصل
-                        </button>
+                    </button>
                       </div>
-                    </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+      </div>
       </div>
 
       {/* Assign Students Modal */}

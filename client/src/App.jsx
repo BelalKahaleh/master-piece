@@ -9,6 +9,9 @@ import AboutUs from "./pages/AboutUs";
 import StudentDashboard from "./studentDashboard";
 import TeacherDashboard from "./teacherDashboard";
 import AdminLogin from "./pages/AdminLogin";
+import TeacherLogin from "./pages/teacher/teacherLogin";
+import TeacherProfile from "./pages/teacher/teacherProfile";
+
 import { Toaster } from 'react-hot-toast';
 
 function App() {
@@ -59,10 +62,18 @@ function App() {
         <Route path="/adminLogin" element={<>
         <AdminLogin />
         </>} />
+        <Route path="/teacherLogin" element={<>
+        <TeacherLogin />
+        </>} />
         {/* Admin routes will not show Navbar or Footer */}
         <Route path="/admin/*" element={<AdminDashboard />} />
         <Route path="/student/*" element={<StudentDashboard />} />
-        <Route path="/teacher/*" element={<TeacherDashboard />} />
+        
+        {/* Teacher routes */}
+        <Route path="/teacher/*" element={<TeacherDashboard />}>
+           {/* Specific teacher routes will be defined inside TeacherDashboard */}
+           <Route path="teacherProfile" element={<TeacherProfile />} />
+        </Route>
       </Routes>
     </>
   );

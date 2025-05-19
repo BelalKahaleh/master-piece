@@ -8,6 +8,7 @@ const teacherSchema = new mongoose.Schema({
   specialization: { type: String, required: true },
   resume:         { type: String }, // filename
   photo:          { type: String }, // filename
+  role:           { type: String, default: 'teacher' },
   createdAt:      { type: Date, default: Date.now }
 })
 

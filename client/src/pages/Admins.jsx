@@ -85,7 +85,7 @@ const Admins = () => {
       } else {
         setError('فشل في إضافة المشرف');
         toast.error('فشل في إضافة المشرف');
-      }
+    }
     } finally {
       setLoading(false);
     }
@@ -96,12 +96,12 @@ const Admins = () => {
       const result = await Swal.fire({
         title: 'هل أنت متأكد؟',
         text: 'لا يمكن التراجع عن حذف المشرف!',
-        icon: 'warning',
-        showCancelButton: true,
+      icon: 'warning',
+      showCancelButton: true,
         confirmButtonColor: '#B17457',
         cancelButtonColor: '#D8D2C2',
         confirmButtonText: 'نعم، احذف المشرف',
-        cancelButtonText: 'إلغاء',
+      cancelButtonText: 'إلغاء',
         reverseButtons: true
       });
 
@@ -169,8 +169,8 @@ const Admins = () => {
         {/* Enhanced Header */}
         <div className="px-6 py-8 rounded-lg shadow-sm mb-8" style={{ backgroundColor: COLORS.bg, borderBottom: `2px solid ${COLORS.accent}` }}>
           <h1 className="text-3xl font-bold mb-3" style={{ color: COLORS.text }}>
-            المسؤولون
-          </h1>
+              المسؤولون
+            </h1>
           <p className="text-sm opacity-75" style={{ color: COLORS.text }}>
             إدارة بيانات المسؤولين
           </p>
@@ -188,8 +188,8 @@ const Admins = () => {
                   {admins.length}
                 </span>
               </div>
-              <button
-                onClick={() => setShowModal(true)}
+            <button
+              onClick={() => setShowModal(true)}
                 className="py-2.5 px-6 rounded-lg text-white font-medium transition-all hover:scale-105 shadow-md hover:shadow-lg flex items-center gap-2"
                 style={{ backgroundColor: COLORS.accent }}
               >
@@ -197,7 +197,7 @@ const Admins = () => {
                   <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                 </svg>
                 إضافة مسؤول
-              </button>
+            </button>
             </div>
           </div>
 
@@ -234,56 +234,56 @@ const Admins = () => {
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-4">
                       <h3 className="font-bold text-xl" style={{ color: COLORS.text }}>
-                        {admin.fullName}
-                      </h3>
-                      <button
+                      {admin.fullName}
+                    </h3>
+                    <button
                         onClick={() => handleDeleteAdmin(admin._id)}
                         className="text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors"
-                        title="حذف المسؤول"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
+                      title="حذف المسؤول"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
                           width="18"
                           height="18"
-                          fill="currentColor"
-                          viewBox="0 0 16 16"
-                        >
-                          <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                          <path
-                            fillRule="evenodd"
-                            d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
-                          />
-                        </svg>
-                      </button>
-                    </div>
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                        <path
+                          fillRule="evenodd"
+                          d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
                           width="16"
                           height="16"
-                          fill={COLORS.accent}
-                          viewBox="0 0 16 16"
-                        >
-                          <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
-                        </svg>
+                      fill={COLORS.accent}
+                      viewBox="0 0 16 16"
+                    >
+                      <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                    </svg>
                         <span className="text-sm" style={{ color: COLORS.text }}>
-                          {admin.fullName}
-                        </span>
-                      </div>
+                      {admin.fullName}
+                    </span>
+                  </div>
                       <div className="flex items-center gap-2">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
                           width="16"
                           height="16"
-                          fill={COLORS.accent}
-                          viewBox="0 0 16 16"
-                        >
-                          <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/>
-                        </svg>
-                        <span className="text-sm" style={{ color: COLORS.text }}>
-                          {admin.email}
-                        </span>
+                      fill={COLORS.accent}
+                      viewBox="0 0 16 16"
+                    >
+                      <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/>
+                    </svg>
+                    <span className="text-sm" style={{ color: COLORS.text }}>
+                      {admin.email}
+                    </span>
                       </div>
                     </div>
                   </div>
@@ -296,9 +296,9 @@ const Admins = () => {
         {/* Enhanced Modal */}
         {showModal && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={() => setShowModal(false)}>
-            <div 
+            <div
               className="bg-white p-8 rounded-lg w-full max-w-md shadow-xl border" 
-              style={{ borderTop: `4px solid ${COLORS.accent}` }} 
+              style={{ borderTop: `4px solid ${COLORS.accent}` }}
               onClick={e => e.stopPropagation()}
             >
               <h2 className="text-2xl font-bold mb-6" style={{ color: COLORS.text }}>
