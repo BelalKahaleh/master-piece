@@ -217,7 +217,7 @@ const Teachers = () => {
                   <div className="flex items-center space-x-4 space-x-reverse mb-4">
                     {t.photo ? (
                       <img
-                        src={`${API}/uploads/${t.photo}`}
+                        src={`http://localhost:5000/uploads/teachers/${t.photo}`}
                         alt={t.fullName}
                         className="h-16 w-16 rounded-full object-cover border-4 border-white shadow-lg"
                       />

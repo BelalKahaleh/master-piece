@@ -162,7 +162,7 @@ const StudentProfile = () => {
   if (loading) {
     return (
       <div>
-        <h1>DEBUG: StudentProfile Rendered (Loading)</h1>
+        
         <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: COLORS.bg }}>
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderColor: COLORS.accent }}></div>
         </div>
@@ -173,7 +173,7 @@ const StudentProfile = () => {
   if (error || !student) {
     return (
       <div>
-        <h1>DEBUG: StudentProfile Rendered (Error)</h1>
+       
         <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: COLORS.bg }}>
           <div className="text-center p-6 rounded-lg" style={{ backgroundColor: COLORS.border + '40', border: `1px solid ${COLORS.border}`, color: COLORS.text }}>
             {error || 'لا توجد بيانات.'}
@@ -185,7 +185,7 @@ const StudentProfile = () => {
 
   return (
     <div>
-      <h1>DEBUG: StudentProfile Rendered (Success)</h1>
+      
       <div className="min-h-screen py-8 px-4" style={{ backgroundColor: COLORS.bg }} dir="rtl">
         <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xl p-6 md:p-8" style={{ borderColor: COLORS.border, borderWidth: '1px' }}>
           {/* Header Section */}

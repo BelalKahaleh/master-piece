@@ -47,7 +47,7 @@ const StudentLogin = () => {
         // Save student data to localStorage
         localStorage.setItem('student', JSON.stringify(response.data.student));
         toast.success('تم تسجيل الدخول بنجاح');
-        navigate('/student-dashboard');
+        navigate('/student-dashboard/profile');
       }
     } catch (error) {
       console.error('Login error:', error);

@@ -30,6 +30,8 @@ app.use(cors({
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
+
+// Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
@@ -39,7 +41,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/classes', classRoutes);
-
 app.use('/api/teachers', teacherRoutes);
 app.use('/api/quizzes', quizRoutes);
 

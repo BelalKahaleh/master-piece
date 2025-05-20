@@ -159,27 +159,10 @@ export default function TeacherProfile() {
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xl p-6 md:p-8 pt-8" style={{ borderColor: COLORS.border, borderWidth: '1px' }} dir="rtl">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-center md:items-start border-b pb-6 mb-6" style={{ borderColor: COLORS.border }}>
-          {/* Photo */}
-          <div className="flex-shrink-0 mb-6 md:mb-0 md:ml-8">
-            {teacher.photo ? (
-              <img
-                src={`http://localhost:5000/uploads/teachers/${teacher.photo}`}
-                alt="Teacher Photo"
-                className="w-32 h-32 rounded-full object-cover border-2" style={{ borderColor: COLORS.border }}
-                onError={(e) => { e.target.onerror = null; e.target.src = '/placeholder-user.png'; }}
-              />
-            ) : (
-              <div className="w-32 h-32 rounded-full flex items-center justify-center border-2" style={{ borderColor: COLORS.border, backgroundColor: COLORS.lightAccent }}>
-                <UserCircleIcon className="w-20 h-20" style={{ color: COLORS.accent }} />
-              </div>
-            )}
-          </div>
-
-          {/* Info */}
+          {/* Info (without photo) */}
           <div className="flex-grow text-center md:text-right">
             <h2 className="text-3xl font-bold mb-2" style={{ color: COLORS.text }}>{teacher.fullName}</h2>
             <p className="text-lg mb-4" style={{ color: COLORS.accent }}>{teacher.specialization}</p>
-            
             <div className="text-sm space-y-2" style={{ color: COLORS.text }}>
               <p className="flex items-center justify-center md:justify-end text-right"><EnvelopeIcon className="w-5 h-5 ml-2" />{teacher.email}</p>
               {/* Add other relevant teacher info here */}
