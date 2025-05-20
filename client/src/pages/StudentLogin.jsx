@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useNavigate, Navigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import HomeLinkButton from '../../components/HomeLinkButton';
+import { toast } from 'react-toastify';
+import { API_BASE_URL } from '../config';
+import HomeLinkButton from '../components/HomeLinkButton';
 
 const COLORS = {
   bg: '#FAF7F0', // Lightest
@@ -12,27 +13,20 @@ const COLORS = {
   inputBg: '#F0EDE5', // A color slightly lighter than main background for input fields
 };
 
-// Simple user icon component (similar to the image)
+// Simple user icon component
 const UserIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-[#B17457]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
     <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 0a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 );
 
-const ProtectedRoute = ({ children, allowedRole }) => {
-  const user = null; // TODO: get user from context, redux, or localStorage
-  if (!user || user.role !== allowedRole) {
-    return <Navigate to="/login" />;
-  }
-  return children;
-};
-
-export default function TeacherLogin() {
+const StudentLogin = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -41,36 +35,25 @@ export default function TeacherLogin() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setError('');
+
     try {
-      const res = await axios.post('http://localhost:5000/api/teachers/login', formData, { withCredentials: true });
-      console.log('Login successful:', res.data);
-      
-      // Store token in a cookie
-      // NOTE: For production, consider using secure, HttpOnly cookies set by the backend.
-      const token = res.data.token;
-      const expires = new Date(Date.now() + 86400 * 1000 * 7).toUTCString(); // Expires in 7 days
-      document.cookie = `teacherToken=${token}; expires=${expires}; path=/; secure; samesite=Strict`;
+      const response = await axios.post(`${API_BASE_URL}/students/login`, formData, {
+        withCredentials: true
+      });
 
-      // Store user data (excluding token for security) in localStorage
-      localStorage.setItem('teacher', JSON.stringify(res.data.teacher));
-
-      // Check role and navigate to dashboard
-      const { role } = res.data.teacher;
-      if (role === 'teacher') {
-        navigate('/teacher/teacherProfile', { replace: true }); // Redirect to teacher dashboard
-      } else if (role === 'student') {
+      if (response.data.message === 'success') {
+        // Save student data to localStorage
+        localStorage.setItem('student', JSON.stringify(response.data.student));
+        toast.success('تم تسجيل الدخول بنجاح');
         navigate('/student-dashboard');
-      } else {
-        setError('Access denied: Unknown role');
-        // Optionally clear stored data if role is incorrect
-        localStorage.removeItem('teacherToken');
-        localStorage.removeItem('teacher');
       }
-
-    } catch (err) {
-      console.error('Login error:', err);
-      setError(err.response?.data?.message || 'Login failed');
+    } catch (error) {
+      console.error('Login error:', error);
+      setError(error.response?.data?.message || 'فشل تسجيل الدخول');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -87,7 +70,7 @@ export default function TeacherLogin() {
           </div>
         </div>
 
-        <h2 className="text-2xl font-bold text-center mb-6" style={{ color: COLORS.text }}>تسجيل دخول المعلم</h2>
+        <h2 className="text-2xl font-bold text-center mb-6" style={{ color: COLORS.text }}>تسجيل دخول الطالب</h2>
         {error && <div className="text-center p-3 rounded mb-4" style={{ color: COLORS.accent, backgroundColor: COLORS.border + '40', border: `1px solid ${COLORS.accent}` }}>{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -116,12 +99,15 @@ export default function TeacherLogin() {
           </div>
           <button
             type="submit"
+            disabled={loading}
             className="w-full px-4 py-2.5 text-lg font-semibold rounded-md hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 transition duration-200" style={{ backgroundColor: COLORS.accent, color: COLORS.bg, borderColor: COLORS.accent, borderWidth: '1px', focusRingColor: COLORS.accent }}
           >
-            تسجيل الدخول
+            {loading ? 'جاري التحميل...' : 'تسجيل الدخول'}
           </button>
         </form>
       </div>
     </div>
   );
-}
+};
+
+export default StudentLogin; 

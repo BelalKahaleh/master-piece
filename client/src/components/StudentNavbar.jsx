@@ -1,18 +1,35 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import StudentProfile from "../pages/student/studentProfile";
+import axios from 'axios';
+import { API_BASE_URL } from '../config';
+import { toast } from 'react-toastify';
 
 const StudentNavbar = () => {
   const [activeItem, setActiveItem] = useState(null);
+  const navigate = useNavigate();
   
   // Navigation items
   const navItems = [
-    { to: "/student/studentProfile", icon: "👨‍🎓", label: "الملف الشخصي" },
-    { to: "/student/studentCourses", icon: "👨‍🏫", label: "المواد" },
-    { to: "/student/exam", icon: "📚", label: "الامتحانات" },
-    { to: "/student/marks", icon: "📰", label: "العلامات" },
-    { to: "/student/studentGuide", icon: "✉️", label: "دليل الطالب" }
+    { to: "/student-dashboard/profile", icon: "👨‍🎓", label: "الملف الشخصي" },
+    { to: "/student-dashboard/courses", icon: "👨‍🏫", label: "المواد" },
+    { to: "/student-dashboard/exam", icon: "📚", label: "الامتحانات" },
+    { to: "/student-dashboard/guide", icon: "✉️", label: "دليل الطالب" }
   ];
+
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/students/logout`, {}, { withCredentials: true });
+      if (response.data.message === "Logged out successfully") {
+        localStorage.removeItem('student');
+        toast.success('تم تسجيل الخروج بنجاح');
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('حدث خطأ أثناء تسجيل الخروج');
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 w-full bg-opacity-95 shadow-md z-50 transition-all duration-300" style={{ backgroundColor: "#4A4947" }}>
@@ -46,6 +63,26 @@ const StudentNavbar = () => {
                 </Link>
               </li>
             ))}
+            {/* Logout Button */}
+            <li className="relative group">
+              <button 
+                onClick={handleLogout}
+                className="flex items-center px-4 py-3 mx-1 my-1 rounded-lg transition-all duration-300"
+                style={{ 
+                  backgroundColor: "transparent",
+                  color: "#FAF7F0"
+                }}
+                onMouseEnter={() => setActiveItem('logout')}
+                onMouseLeave={() => setActiveItem(null)}
+              >
+                <span className="mr-2 text-lg">🚪</span>
+                <span>تسجيل الخروج</span>
+                <span 
+                  className="absolute bottom-0 right-0 w-0 h-1 transition-all duration-300 group-hover:w-full rounded-lg"
+                  style={{ backgroundColor: "#FAF7F0" }}
+                ></span>
+              </button>
+            </li>
           </ul>
         </div>
         

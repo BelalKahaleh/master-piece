@@ -3,17 +3,36 @@ const multer = require("multer");
 const path   = require("path");
 const fs = require("fs");
 
-// تأكد من أن هذا المسار صحيح وينتهي بوجود مجلّد uploads/news
-const UPLOAD_DIR = path.join(__dirname, "../uploads/news");
+// Define upload directories
+const UPLOAD_BASE_DIR = path.join(__dirname, "../uploads");
+const NEWS_UPLOAD_DIR = path.join(UPLOAD_BASE_DIR, "news");
+const STUDENTS_UPLOAD_DIR = path.join(UPLOAD_BASE_DIR, "students");
 
-// Create the directory if it doesn't exist
-if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-}
+// Create the directories if they don't exist
+const ensureDirectoryExists = (dirPath) => {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+};
+
+ensureDirectoryExists(NEWS_UPLOAD_DIR);
+ensureDirectoryExists(STUDENTS_UPLOAD_DIR);
 
 // إعداد التخزين
 const storage = multer.diskStorage({
-  destination: (_, __, cb) => cb(null, UPLOAD_DIR),
+  destination: (req, file, cb) => {
+    // Determine destination based on fieldname
+    let destinationDir;
+    if (['transcript', 'birthCert', 'photo'].includes(file.fieldname)) {
+      destinationDir = STUDENTS_UPLOAD_DIR;
+    } else if (file.fieldname === 'images') { // Assuming news images field is 'images'
+      destinationDir = NEWS_UPLOAD_DIR;
+    } else {
+      // Default destination or handle other file types
+      destinationDir = UPLOAD_BASE_DIR;
+    }
+    cb(null, destinationDir);
+  },
   filename:    (_, file, cb) => {
     const uniqueSuffix = Date.now() + "_" + Math.round(Math.random() * 1e9);
     const ext = path.extname(file.originalname);

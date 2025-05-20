@@ -1,9 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaFacebook, FaLinkedin, FaTwitter, FaInstagram, FaChevronDown } from 'react-icons/fa';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import axios from 'axios';
 
 const Home = () => {
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
+  const [latestNews, setLatestNews] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLatestNews = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/news?limit=3');
+        setLatestNews(response.data.news || []);
+      } catch (error) {
+        console.error('Error fetching latest news:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLatestNews();
+  }, []);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('ar-SA', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }).format(date);
+  };
 
   return (
     <div className="bg-[#FAF7F0] font-[Tajawal], sans-serif text-right" dir="rtl">
@@ -40,6 +67,94 @@ const Home = () => {
           <Link to="#why-us" className="text-white animate-bounce inline-block">
             <FaChevronDown size={24} />
           </Link>
+        </div>
+      </section>
+
+      {/* Latest News Section */}
+      <section className="py-24 bg-[#FAF7F0]">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-[#4A4947] mb-6">أحدث الأخبار</h2>
+            <div className="w-24 h-1 bg-[#B17457] mx-auto mb-8"></div>
+            <p className="text-xl text-[#4A4947] max-w-3xl mx-auto leading-relaxed">
+              تعرف على آخر الأخبار والتحديثات في مدرستنا
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="w-12 h-12 border-t-4 border-[#B17457] rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-[#4A4947]">جاري تحميل الأخبار...</p>
+            </div>
+          ) : latestNews.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-[#4A4947]">لا توجد أخبار متاحة حالياً</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {latestNews.map((news) => (
+                <div key={news._id} className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:scale-105 transition duration-300">
+                  {Array.isArray(news.images) && news.images.length > 0 && (
+                    <div className="h-48 overflow-hidden">
+                      <img
+                        src={`http://localhost:5000/uploads/${news.images[0]}`}
+                        alt={news.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src = '/placeholder-image.png';
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="text-xl font-bold text-[#4A4947] line-clamp-1">
+                        {news.title}
+                      </h3>
+                      {news.createdAt && (
+                        <span className="text-xs opacity-60 py-1 px-2 rounded-full bg-[rgba(177,116,87,0.1)] text-[#4A4947]">
+                          {formatDate(news.createdAt)}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[#4A4947] mb-4 line-clamp-2">
+                      {news.details}
+                    </p>
+                    {news.tags && news.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {news.tags.map((tag, i) => (
+                          <span 
+                            key={i} 
+                            className="text-xs py-0.5 px-2 rounded-full"
+                            style={{ backgroundColor: 'rgba(177,116,87,0.1)', color: '#B17457' }}
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <Link 
+                      to="/news"
+                      className="mt-4 block w-full py-2 px-4 text-center rounded-lg text-white transition-all hover:opacity-90"
+                      style={{ backgroundColor: '#B17457' }}
+                    >
+                      اقرأ المزيد
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="text-center mt-12">
+            <Link 
+              to="/news"
+              className="inline-block py-3 px-8 rounded-lg text-white transition-all hover:opacity-90"
+              style={{ backgroundColor: '#B17457' }}
+            >
+              عرض جميع الأخبار
+            </Link>
+          </div>
         </div>
       </section>
 

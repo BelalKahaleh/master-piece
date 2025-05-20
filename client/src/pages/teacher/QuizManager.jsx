@@ -23,6 +23,7 @@ export default function QuizManager() {
   const classesPerPage = 6;
   const totalPages = Math.ceil(classes.length / classesPerPage);
   const paginatedClasses = classes.slice((currentPage - 1) * classesPerPage, currentPage * classesPerPage);
+  const [quizResults, setQuizResults] = useState({}); // { quizId: [results] }
 
   useEffect(() => {
     axios.get(`${API_BASE_URL}/quizzes/my-classes`, { withCredentials: true })
@@ -54,10 +55,23 @@ export default function QuizManager() {
     setMessage('');
   };
 
-  const openQuizDetails = (cls) => {
+  const openQuizDetails = async (cls) => {
     setSelectedClass(cls);
     setSelectedQuizList(quizzes[cls._id] || []);
     setShowQuizDetails(true);
+    
+    // Fetch results for all quizzes in this class
+    const results = {};
+    for (const quiz of quizzes[cls._id] || []) {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/quizzes/${quiz._id}/results`, { withCredentials: true });
+        results[quiz._id] = response.data;
+      } catch (error) {
+        console.error('Error fetching quiz results:', error);
+        results[quiz._id] = [];
+      }
+    }
+    setQuizResults(results);
   };
 
   const closeQuizDetails = () => {
@@ -125,9 +139,46 @@ export default function QuizManager() {
 
   const submitQuiz = async () => {
     try {
-      const scheduledDateTime = scheduledDate && scheduledTime
-        ? new Date(`${scheduledDate}T${scheduledTime}`).toISOString()
-        : null;
+      // Validate required fields
+      if (!quizTitle.trim()) {
+        await Swal.fire({
+          title: 'خطأ!',
+          text: 'يرجى إدخال عنوان الاختبار',
+          icon: 'error',
+          confirmButtonColor: '#B17457',
+        });
+        return;
+      }
+
+      if (!scheduledDate || !scheduledTime) {
+        await Swal.fire({
+          title: 'خطأ!',
+          text: 'يرجى تحديد تاريخ ووقت الاختبار',
+          icon: 'error',
+          confirmButtonColor: '#B17457',
+        });
+        return;
+      }
+
+      // Validate questions
+      const invalidQuestions = questions.filter(q => 
+        !q.question.trim() || 
+        q.options.some(opt => !opt.trim()) || 
+        !q.answer
+      );
+
+      if (invalidQuestions.length > 0) {
+        await Swal.fire({
+          title: 'خطأ!',
+          text: 'يرجى التأكد من إدخال جميع الأسئلة والخيارات والإجابات الصحيحة',
+          icon: 'error',
+          confirmButtonColor: '#B17457',
+        });
+        return;
+      }
+
+      const scheduledDateTime = new Date(`${scheduledDate}T${scheduledTime}`).toISOString();
+
       if (editQuizId) {
         // Update existing quiz
         await axios.put(`${API_BASE_URL}/quizzes/${editQuizId}`, {
@@ -145,27 +196,31 @@ export default function QuizManager() {
         setMessage('تم تحديث الاختبار بنجاح!');
       } else {
         // Create new quiz
-        await axios.post(`${API_BASE_URL}/quizzes`, {
+        const response = await axios.post(`${API_BASE_URL}/quizzes`, {
           classId: selectedClass._id,
           title: quizTitle,
           questions,
           scheduledDate: scheduledDateTime,
           duration: Number(duration)
         }, { withCredentials: true });
-        await Swal.fire({
-          title: 'تمت الإضافة!',
-          text: 'تم إضافة الاختبار بنجاح.',
-          icon: 'success',
-          confirmButtonColor: '#B17457',
-        });
-        setMessage('تم إضافة الاختبار بنجاح!');
+
+        if (response.data) {
+          await Swal.fire({
+            title: 'تمت الإضافة!',
+            text: 'تم إضافة الاختبار بنجاح.',
+            icon: 'success',
+            confirmButtonColor: '#B17457',
+          });
+          setMessage('تم إضافة الاختبار بنجاح!');
+        }
       }
       setShowModal(false);
       setEditQuizId(null);
-    } catch {
+    } catch (error) {
+      console.error('Quiz submission error:', error.response?.data || error);
       await Swal.fire({
         title: 'خطأ!',
-        text: 'حدث خطأ أثناء حفظ الاختبار',
+        text: error.response?.data?.message || 'حدث خطأ أثناء حفظ الاختبار',
         icon: 'error',
         confirmButtonColor: '#B17457',
       });
@@ -509,6 +564,37 @@ export default function QuizManager() {
                         </ul>
                       </div>
                     ))}
+                  </div>
+                  <div className="mt-8 border-t border-[#D8D2C2] pt-6">
+                    <div className="font-bold text-lg text-[#4A4947] mb-4">نتائج الطلاب:</div>
+                    {quizResults[quiz._id]?.length > 0 ? (
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse">
+                          <thead>
+                            <tr className="bg-[#B17457] text-white">
+                              <th className="p-3 text-right">اسم الطالب</th>
+                              <th className="p-3 text-right">الدرجة</th>
+                              <th className="p-3 text-right">عدد الأسئلة</th>
+                              <th className="p-3 text-right">تاريخ التسليم</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {quizResults[quiz._id].map((result, idx) => (
+                              <tr key={idx} className="border-b border-[#D8D2C2] hover:bg-[#FAF7F0]">
+                                <td className="p-3 text-right">{result.student.fullName}</td>
+                                <td className="p-3 text-right">{result.score} / {result.totalQuestions}</td>
+                                <td className="p-3 text-right">{result.totalQuestions}</td>
+                                <td className="p-3 text-right">{new Date(result.submittedAt).toLocaleString('ar-EG')}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="text-center text-[#B17457] py-4">
+                        لا توجد نتائج لهذا الاختبار بعد
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

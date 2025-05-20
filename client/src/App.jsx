@@ -11,9 +11,12 @@ import TeacherDashboard from "./teacherDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import TeacherLogin from "./pages/teacher/teacherLogin";
 import TeacherProfile from "./pages/teacher/teacherProfile";
-
+import PublicNews from './pages/PublicNews';
 import { Toaster } from 'react-hot-toast';
-
+import StudentLogin from './pages/StudentLogin';
+import StudentHome from './pages/student/StudentHome';
+import StudentProfile from './pages/student/studentProfile';
+import StudentGuide from './pages/student/StudentGuide'
 function App() {
   return (
     <>
@@ -41,39 +44,23 @@ function App() {
       />
       <Routes>
         {/* Home page will have Navbar and Footer */}
-        <Route path="/" element={<>
-        <Navbar />
-        <Home />
-        <Footer />
-        </>} />
-
-        <Route path="/contact" element={<>
-        <Navbar />
-        <Contact />
-        <Footer />
-        </>} />
-
-        <Route path="/AboutUs" element={<>
-        <Navbar />
-        <AboutUs />
-        <Footer />
-        </>} />
-        
-        <Route path="/adminLogin" element={<>
-        <AdminLogin />
-        </>} />
-        <Route path="/teacherLogin" element={<>
-        <TeacherLogin />
-        </>} />
+        <Route path="/" element={<><Navbar /><Home /><Footer /></>} />
+        <Route path="/contact" element={<><Navbar /><Contact /><Footer /></>} />
+        <Route path="/AboutUs" element={<><Navbar /><AboutUs /><Footer /></>} />
+        <Route path="/adminLogin" element={<><AdminLogin /></>} />
+        <Route path="/teacherLogin" element={<><TeacherLogin /></>} />
         {/* Admin routes will not show Navbar or Footer */}
         <Route path="/admin/*" element={<AdminDashboard />} />
-        <Route path="/student/*" element={<StudentDashboard />} />
-        
         {/* Teacher routes */}
         <Route path="/teacher/*" element={<TeacherDashboard />}>
-           {/* Specific teacher routes will be defined inside TeacherDashboard */}
            <Route path="teacherProfile" element={<TeacherProfile />} />
         </Route>
+        <Route path="/news" element={<><Navbar /><PublicNews /><Footer /></>} />
+        <Route path="/student-login" element={<StudentLogin />} />
+        <Route path="/studentLogin" element={<StudentLogin />} />
+        <Route path="/student-dashboard/*" element={<StudentDashboard />} />
+        <Route path="/student/studentProfile" element={<StudentProfile />} />
+        <Route path="/student-dashboard/studentGuide" element={<StudentGuide />} />
       </Routes>
     </>
   );
