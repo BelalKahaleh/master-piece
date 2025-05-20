@@ -29,13 +29,13 @@ const Footer = () => {
             <h4 className="text-xl font-bold mb-6 text-[#D8D2C2] border-r-4 border-[#B17457] pr-4">روابط سريعة</h4>
             <ul className="space-y-3">
               <li>
-                <Link to="studentForm" className="text-[#FAF7F0] hover:text-[#B17457] transition-colors duration-300 flex items-center">
-                  <span className="hover:pr-2 transition-all duration-300">التسجيل كطالب</span>
+                <Link to="studentLogin" className="text-[#FAF7F0] hover:text-[#B17457] transition-colors duration-300 flex items-center">
+                  <span className="hover:pr-2 transition-all duration-300">بوابة الطالب</span>
                 </Link>
               </li>
               <li>
-                <Link to="teacherForm" className="text-[#FAF7F0] hover:text-[#B17457] transition-colors duration-300 flex items-center">
-                  <span className="hover:pr-2 transition-all duration-300">التسجيل كمعلم</span>
+                <Link to="teacherLogin" className="text-[#FAF7F0] hover:text-[#B17457] transition-colors duration-300 flex items-center">
+                  <span className="hover:pr-2 transition-all duration-300">بوابة المعلم</span>
                 </Link>
               </li>
               <li>
