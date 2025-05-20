@@ -43,6 +43,11 @@ Before starting the application, make sure you have the following installed:
 - **npm** (Node package manager)
 
 
+
+
+
+
+
   **figma link** : https://www.figma.com/design/fpN8q5b1lsVhkaB3M3JPbX/school?t=4rQD9qKoeu7GD0Qr-0
   
   **trello link** : https://trello.com/b/ABhnOsvd/%D8%A7%D9%84%D8%AD%D8%B5%D8%A7%D8%AF-%D8%A7%D9%84%D8%AA%D8%B1%D8%A8%D9%88%D9%8A
