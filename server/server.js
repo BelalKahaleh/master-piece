@@ -39,6 +39,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/classes', classRoutes);
+
 app.use('/api/teachers', teacherRoutes);
 app.use('/api/quizzes', quizRoutes);
 
