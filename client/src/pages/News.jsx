@@ -47,7 +47,7 @@ const News = () => {
   const [isEditing, setIsEditing] = useState(false)
   const [newsToEdit, setNewsToEdit] = useState(null)
   const [currentPage, setCurrentPage] = useState(1);
-  const [newsPerPage] = useState(6);
+  const [newsPerPage] = useState(2);
   const [totalNews, setTotalNews] = useState(0);
 
   useEffect(() => {
@@ -78,35 +78,14 @@ const News = () => {
       const previews = []
       Array.from(files).forEach(file => {
         const reader = new FileReader()
-        reader.onload = e => previews.push(e.target.result)
+        reader.onload = e => {
+          previews.push(e.target.result)
+          setPreviewImages([...previews])
+        }
         reader.readAsDataURL(file)
       })
-      setPreviewImages(previews)
     } else {
       setForm(prev => ({ ...prev, [name]: value }))
-    }
-  }
-
-  const handleAdd = async e => {
-    e.preventDefault()
-    setError('')
-    const data = new FormData()
-    data.append('title', form.title)
-    data.append('details', form.details)
-    data.append('tags', form.tags)
-    Array.from(form.images).forEach(file => {
-      data.append('images', file)
-    })
-    try {
-      await axios.post(API_URL, data, {
-        withCredentials: true,
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
-      await fetchNews()
-      resetForm()
-    } catch (err) {
-      console.error(err)
-      setError('خطأ في إضافة خبر')
     }
   }
 
@@ -159,16 +138,10 @@ const News = () => {
     }).format(date)
   }
 
-  // Icon components
+  // Icon components (unchanged)
   const NewsIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke={COLORS.accent} strokeWidth="1.5">
       <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-    </svg>
-  )
-
-  const AddIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
     </svg>
   )
 
@@ -207,13 +180,6 @@ const News = () => {
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
       <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
     </svg>
-  )
-
-  const FormField = ({ label, children }) => (
-    <div className="mb-4">
-      <label className="block text-sm font-medium mb-1.5" style={{ color: COLORS.text }}>{label}</label>
-      {children}
-    </div>
   )
 
   const handleEditNews = (newsItem) => {
@@ -322,9 +288,17 @@ const News = () => {
       {/* Main Content */}
       <div className="flex-1 p-2 sm:p-4 md:p-6 lg:mr-64">
         <div className="px-4 py-6 shadow-sm" style={{ backgroundColor: COLORS.bg, borderBottom: `1px solid ${COLORS.border}` }}>
-          <h1 className="text-3xl font-bold mb-2" style={{ color: COLORS.text }}>
-            الأخبار
-          </h1>
+          <div className="flex justify-between items-center mb-2">
+            <h1 className="text-3xl font-bold" style={{ color: COLORS.text }}>
+              الأخبار
+            </h1>
+            <button
+              onClick={() => setShowAdd(true)}
+              className="py-2 px-4 rounded bg-[#B17457] text-white hover:bg-[#9A6249] transition-colors"
+            >
+              إضافة خبر جديد
+            </button>
+          </div>
           <p className="text-sm opacity-75" style={{ color: COLORS.text }}>
             إدارة الأخبار والإعلانات
           </p>
@@ -381,7 +355,7 @@ const News = () => {
                   {viewMode === 'list' && Array.isArray(item.images) && item.images.length > 0 && (
                     <div className="md:w-48 w-full h-40 md:h-auto flex-shrink-0">
                       <img
-                        src={`http://localhost:5000/uploads/${item.images[0]}`}
+                        src={`http://localhost:5000/uploads/news/${item.images[0]}`}
                         alt=""
                         className="w-full h-full object-cover"
                         onError={(e) => {
@@ -412,8 +386,8 @@ const News = () => {
                           <TagIcon />
                           <div className="mr-1.5 flex flex-wrap gap-1">
                             {item.tags.map((tag, i) => (
-                              <span 
-                                key={i} 
+                              <span
+                                key={i}
                                 className="text-xs py-0.5 px-2 rounded-full"
                                 style={{ backgroundColor: COLORS.lightAccent, color: COLORS.accent }}
                               >
@@ -457,7 +431,7 @@ const News = () => {
                   {viewMode === 'grid' && Array.isArray(item.images) && item.images.length > 0 && (
                     <div className="relative h-40 mb-4 rounded-lg overflow-hidden">
                       <img
-                        src={`http://localhost:5000/uploads/${item.images[0]}`}
+                        src={`http://localhost:5000/uploads/news/${item.images[0]}`}
                         alt=""
                         className="w-full h-full object-cover"
                         onError={(e) => {
@@ -512,7 +486,7 @@ const News = () => {
         {/* Add Modal */}
         {showAdd && (
           <div
-            className="fixed inset-0 bg-black/50 flex items-center justify-center"
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
             onClick={() => setShowAdd(false)}
           >
             <div
@@ -522,7 +496,10 @@ const News = () => {
               <h2 className="text-2xl mb-4" style={{ color: COLORS.text }}>
                 {isEditing ? 'تعديل الخبر' : 'إضافة خبر جديد'}
               </h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <p className="text-red-600 mb-3" dir="rtl">{error}</p>
+              )}
+              <form onSubmit={handleSubmit} className="space-y-4" dir="rtl">
                 <div>
                   <label className="block mb-1" style={{ color: COLORS.text }}>عنوان الخبر</label>
                   <input
@@ -566,11 +543,19 @@ const News = () => {
                     onChange={handleChange}
                     className="w-full"
                   />
+                  {/* Preview selected images */}
+                  {previewImages.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {previewImages.map((src, i) => (
+                        <img key={i} src={src} alt={`preview-${i}`} className="w-16 h-16 object-cover rounded" />
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <div className="flex justify-end space-x-2">
+                <div className="flex justify-end space-x-2" dir="ltr">
                   <button
                     type="button"
-                    onClick={() => setShowAdd(false)}
+                    onClick={resetForm}
                     className="py-2 px-4 rounded border"
                     style={{ borderColor: COLORS.border, color: COLORS.text }}
                   >
@@ -578,10 +563,11 @@ const News = () => {
                   </button>
                   <button
                     type="submit"
-                    className="py-2 px-4 rounded text-white"
+                    disabled={loading}
+                    className="py-2 px-4 rounded text-white disabled:opacity-60"
                     style={{ backgroundColor: COLORS.accent }}
                   >
-                    حفظ
+                    {loading ? 'جاري الحفظ...' : 'حفظ'}
                   </button>
                 </div>
               </form>
@@ -609,13 +595,13 @@ const News = () => {
                   <CloseIcon />
                 </button>
               </div>
-              
+
               {/* Modal Content */}
               {console.log('News Detail Item:', detailItem)}
               {Array.isArray(detailItem.images) && detailItem.images.length > 0 && (
                 <div className="w-full h-64 sm:h-80 overflow-hidden">
                   <img
-                    src={`http://localhost:5000/uploads/${detailItem.images[0]}`}
+                    src={`http://localhost:5000/uploads/news/${detailItem.images[0]}`}
                     alt="News Image"
                     onError={(e) => {
                       console.error('Failed to load news image:', e.target.src);
@@ -625,7 +611,7 @@ const News = () => {
                   />
                 </div>
               )}
-              
+
               <div className="p-6 space-y-6 overflow-y-auto max-h-[calc(80vh-256px)]" style={{ borderTop: Array.isArray(detailItem.images) && detailItem.images.length > 0 ? `1px solid ${COLORS.border}` : 'none' }}>
                 <div>
                   <h2 className="text-2xl font-bold mb-2" style={{ color: COLORS.text }}>
@@ -637,14 +623,14 @@ const News = () => {
                     </p>
                   )}
                 </div>
-                
+
                 {/* Display other images if more than one */}
                 {Array.isArray(detailItem.images) && detailItem.images.length > 1 && (
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {detailItem.images.slice(1).map((image, index) => (
                       <img
                         key={index}
-                        src={`http://localhost:5000/uploads/${image}`}
+                        src={`http://localhost:5000/uploads/news/${image}`}
                         alt={`News Image ${index + 2}`}
                         onError={(e) => {
                           console.error('Failed to load news image:', e.target.src);
@@ -668,8 +654,8 @@ const News = () => {
                     <h3 className="text-lg font-semibold mb-3" style={{ color: COLORS.darkAccent }}>الوسوم:</h3>
                     <div className="flex flex-wrap gap-2">
                       {detailItem.tags.map((tag, i) => (
-                        <span 
-                          key={i} 
+                        <span
+                          key={i}
                           className="text-xs py-1 px-3 rounded-full"
                           style={{ backgroundColor: COLORS.lightAccent, color: COLORS.accent }}
                         >

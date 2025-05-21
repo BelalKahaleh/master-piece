@@ -97,7 +97,7 @@ const Home = () => {
                   {Array.isArray(news.images) && news.images.length > 0 && (
                     <div className="h-48 overflow-hidden">
                       <img
-                        src={`http://localhost:5000/uploads/${news.images[0]}`}
+                        src={`http://localhost:5000/uploads/news/${news.images[0]}`}
                         alt={news.title}
                         className="w-full h-full object-cover"
                         onError={(e) => {

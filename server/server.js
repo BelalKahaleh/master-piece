@@ -34,6 +34,8 @@ app.use(cookieParser());
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+
+
 // Routes
 app.use('/api/students', studentRoute);
 app.use('/api/admin', adminRoute);

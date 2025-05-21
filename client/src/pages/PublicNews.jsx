@@ -50,10 +50,8 @@ const PublicNews = () => {
     }).format(date);
   };
 
-  // Calculate total pages
   const totalPages = Math.ceil(totalNews / newsPerPage);
 
-  // Handle page change
   const handlePageChange = (pageNumber) => {
     if (pageNumber < 1 || pageNumber > totalPages) return;
     setCurrentPage(pageNumber);
@@ -71,7 +69,6 @@ const PublicNews = () => {
           </p>
         </div>
 
-        {/* View Toggle Buttons */}
         <div className="flex justify-end mb-6 gap-2">
           <button
             className={`p-2 rounded-lg transition-all ${
@@ -97,7 +94,6 @@ const PublicNews = () => {
           </button>
         </div>
 
-        {/* Loading State */}
         {loading ? (
           <div className="text-center py-12">
             <div className="w-12 h-12 border-t-4 border-accent rounded-full animate-spin mx-auto mb-4" style={{ borderTopColor: COLORS.accent }}></div>
@@ -113,7 +109,6 @@ const PublicNews = () => {
           </div>
         ) : (
           <>
-            {/* News Grid/List */}
             <div className={
               viewMode === 'grid'
                 ? 'grid md:grid-cols-2 lg:grid-cols-3 gap-6'
@@ -126,21 +121,17 @@ const PublicNews = () => {
                     viewMode === 'list' ? 'flex md:flex-row flex-col items-stretch' : 'flex flex-col'
                   }`}
                 >
-                  {/* Image */}
                   {Array.isArray(item.images) && item.images.length > 0 && (
                     <div className={`${viewMode === 'list' ? 'md:w-48 w-full h-40 md:h-auto' : 'h-48'}`}>
                       <img
-                        src={`http://localhost:5000/uploads/${item.images[0]}`}
+                        src={`http://localhost:5000/uploads/news/${item.images[0]}`}
                         alt={item.title}
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.src = '/placeholder-image.png';
-                        }}
+                        onError={(e) => { e.target.src = '/placeholder-image.png'; }}
                       />
                     </div>
                   )}
 
-                  {/* Content */}
                   <div className={`p-5 flex-1 flex flex-col ${viewMode === 'list' ? 'justify-between' : ''}`}>
                     <div>
                       <div className="flex justify-between items-start mb-3">
@@ -182,7 +173,6 @@ const PublicNews = () => {
               ))}
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex justify-center mt-8 space-x-2">
                 <button
@@ -223,14 +213,12 @@ const PublicNews = () => {
         )}
       </div>
 
-      {/* News Details Modal */}
       {selectedNews && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedNews(null)}>
           <div 
             className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
-            {/* Close button */}
             <button
               onClick={() => setSelectedNews(null)}
               className="absolute top-4 left-4 p-2 rounded-full bg-white/80 hover:bg-white transition-all"
@@ -239,19 +227,15 @@ const PublicNews = () => {
               <X size={20} style={{ color: COLORS.text }} />
             </button>
 
-            {/* Modal content */}
             <div className="p-6">
-              {/* Image gallery */}
               {Array.isArray(selectedNews.images) && selectedNews.images.length > 0 && (
                 <div className="mb-6">
                   <div className="relative h-64 rounded-lg overflow-hidden">
                     <img
-                      src={`http://localhost:5000/uploads/${selectedNews.images[0]}`}
+                      src={`http://localhost:5000/uploads/news/${selectedNews.images[0]}`}
                       alt={selectedNews.title}
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.src = '/placeholder-image.png';
-                      }}
+                      onError={(e) => { e.target.src = '/placeholder-image.png'; }}
                     />
                   </div>
                   {selectedNews.images.length > 1 && (
@@ -259,12 +243,10 @@ const PublicNews = () => {
                       {selectedNews.images.slice(1).map((image, index) => (
                         <img
                           key={index}
-                          src={`http://localhost:5000/uploads/${image}`}
+                          src={`http://localhost:5000/uploads/news/${image}`}
                           alt={`${selectedNews.title} - Image ${index + 2}`}
                           className="w-full h-20 object-cover rounded-lg"
-                          onError={(e) => {
-                            e.target.src = '/placeholder-image.png';
-                          }}
+                          onError={(e) => { e.target.src = '/placeholder-image.png'; }}
                         />
                       ))}
                     </div>
@@ -272,7 +254,6 @@ const PublicNews = () => {
                 </div>
               )}
 
-              {/* Title and date */}
               <div className="mb-4">
                 <h2 className="text-2xl font-bold mb-2" style={{ color: COLORS.text }}>
                   {selectedNews.title}
@@ -284,14 +265,12 @@ const PublicNews = () => {
                 )}
               </div>
 
-              {/* Full details */}
               <div className="mb-6">
                 <p className="text-base leading-relaxed whitespace-pre-wrap" style={{ color: COLORS.text }}>
                   {selectedNews.details}
                 </p>
               </div>
 
-              {/* Tags */}
               {selectedNews.tags && selectedNews.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {selectedNews.tags.map((tag, i) => (
@@ -313,4 +292,4 @@ const PublicNews = () => {
   );
 };
 
-export default PublicNews; 
+export default PublicNews;
